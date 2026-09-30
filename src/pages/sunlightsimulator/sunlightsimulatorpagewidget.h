@@ -43,6 +43,7 @@ private:
     // the MATLAB evaluator when toggling normalization.
     EvaluatedMetrics m_lastMetrics;
     QVector<double> m_lastWeights;
+    QVector<int> m_lastSelectedLedIndices;
 
     void populateLeds();
     QVector<int> selectedLedIndices() const;

@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
-project(LED_GUI LANGUAGES CXX)
+set(LED_GUI_VERSION "1.0.0" CACHE STRING "LED GUI release version")
+project(LED_GUI VERSION ${LED_GUI_VERSION} LANGUAGES CXX)
 
 # --- Output Directorys ---
 # Forces all compiled binaries (exe) to separated output directories (Debug, Release)
@@ -178,9 +179,7 @@ if(WIN32)
     set(CPACK_GENERATOR "NSIS")
     set(CPACK_PACKAGE_NAME "LED_GUI")
     set(CPACK_PACKAGE_VENDOR "Your Company Name")
-    set(CPACK_PACKAGE_VERSION_MAJOR "1")
-    set(CPACK_PACKAGE_VERSION_MINOR "0")
-    set(CPACK_PACKAGE_VERSION_PATCH "0")
+    set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
     
     # NSIS specific settings for installation path and UI names
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "LED_GUI")

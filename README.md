@@ -20,6 +20,7 @@
     - [`update_project.ps1` — Complete Project Update (Recommended)](#update_projectps1--complete-project-update-recommended)
     - [`update_matlab.ps1` — MATLAB Build Only](#update_matlabps1--matlab-build-only)
     - [`build_release_exe.ps1` — Release Rebuild \& Packaging](#build_release_exeps1--release-rebuild--packaging)
+    - [`publish_release.ps1` — Build \& Publish Forgejo Release](#publish_releaseps1--build--publish-forgejo-release)
     - [`update_qt.ps1` — Qt Build \& Run Only](#update_qtps1--qt-build--run-only)
   - [Uninstalling the Application](#uninstalling-the-application)
   - [License](#license)
@@ -32,6 +33,7 @@ This application is used to control a specific light box and is built with C++ u
 
 > Qt (/ˈkjuːt/ pronounced "cute") is a cross-platform application development framework for creating graphical user interfaces as well as cross-platform applications that run on various software and hardware platforms such as Linux, Windows, macOS, Android or embedded systems with little or no change in the underlying codebase while still being a native application with native capabilities and speed. [[Wikipedia](https://en.wikipedia.org/wiki/Qt_(software))]
 
+
 ---
 
 ## Prerequisites
@@ -39,6 +41,7 @@ This application is used to control a specific light box and is built with C++ u
 Ensure you have the following software and tools installed before building the project. Where applicable, you can use [WinGet](https://github.com/microsoft/winget-cli) for quick installation via a terminal.
 
 ### 1. C++ Compiler & Qt Framework
+
 - **[Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/)** (C/C++ Compiler for Windows)
   ```powershell
   winget install -e --id=Microsoft.VisualStudio.2022.Community
@@ -359,6 +362,28 @@ Rebuilds the Release executable from source and packages it for distribution:
   ```powershell
   .\scripts\build_release_exe.ps1 -SkipInstaller
   ```
+
+### `publish_release.ps1` — Build & Publish Forgejo Release
+Builds a versioned Windows installer locally and publishes it as a Forgejo release asset:
+
+```powershell
+.\scripts\publish_release.ps1 -Version 1.0.1 -ReleaseNotes "Bug fixes and improvements"
+```
+
+The script:
+1. Verifies that the working tree is clean
+2. Configures CMake and builds the versioned NSIS installer
+3. Creates and pushes the corresponding Git tag (for example, `v1.0.1`)
+4. Calculates the installer SHA-256 checksum
+5. Creates the Forgejo release and uploads the installer
+
+The Forgejo API token is requested securely at runtime and is not stored in the repository. The token must have `write:repository` permission.
+
+Use `-Draft` or `-Prerelease` when appropriate. To publish an already-built installer without rebuilding:
+
+```powershell
+.\scripts\publish_release.ps1 -Version 1.0.1 -SkipBuild
+```
 
 ### `update_qt.ps1` — Qt Build & Run Only
 Builds the C++ Qt project and runs the resulting executable:

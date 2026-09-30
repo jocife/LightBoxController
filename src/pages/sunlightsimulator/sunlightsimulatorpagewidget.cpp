@@ -140,6 +140,7 @@ void SunlightSimulatorPageWidget::triggerCalculate()
     // 1. Run MATLAB algorithm to get optimal weights
     QVector<double> weights = runFminconOptimization(csvPath, illuminantIndex, ',', ';', selectedLeds);
     m_lastWeights = weights;
+    m_lastSelectedLedIndices = selectedLeds;
 
     // 2. Evaluate all metrics using the weights
     EvaluatedMetrics metrics = runMetricsEvaluation(weights, csvPath, illuminantIndex, ',', ';', selectedLeds);
@@ -164,9 +165,12 @@ void SunlightSimulatorPageWidget::triggerSave()
                                                     tr("XML (*.xml);;All Files (*)"));
     if (filePath.isEmpty()) return;
 
-    QVector<int> values;
-    for (double weight : m_lastWeights)
-        values.append(qRound(weight * 100.0));
+    QVector<int> values(PresetFileManager::ledNames().size(), 0);
+    for (int ledIndex : m_lastSelectedLedIndices) {
+        if (ledIndex >= 0 && ledIndex < m_lastWeights.size()) {
+            values[ledIndex] = qRound(m_lastWeights.at(ledIndex) * 100.0);
+        }
+    }
 
     QString errorMessage;
     if (!PresetFileManager::save(filePath, values, &errorMessage)) {
@@ -214,22 +218,6 @@ void SunlightSimulatorPageWidget::updateChart()
             value *= scalingFactor;
         }
     }
-
-    // ONLY FOR TEST, REMOVE LATER
-    // Emit log message with the current sum of the normalized test SPD for debugging purposes
-    double sumTestSPD = 0.0;
-    for (double v : testPlot) {
-        sumTestSPD += v;
-    }
-    qDebug() << "Sum of normalized test SPD:" << sumTestSPD;
-
-    // Emit log message with the current sum of the normalized reference SPD for debugging purposes
-    double sumRefSPD = 0.0;
-    for (double v : refPlot) {
-        sumRefSPD += v;
-    }
-    qDebug() << "Sum of normalized reference SPD:" << sumRefSPD;
-    // ONLY FOR TEST, REMOVE LATER
 
     // Replot series
     m_testSeries->clear();

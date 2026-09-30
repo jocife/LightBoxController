@@ -11,10 +11,17 @@ namespace {
 constexpr int WLS_COUNT = 81;
 constexpr int LED_COUNT = 22;
 
-// Helper function to determine if a given LED index is selected based on the provided list of selected indices.
-bool isLedSelected(int ledIndex, const QVector<int> &selectedLedIndices)
+QVector<int> activeLedIndices(const QVector<int> &selectedLedIndices)
 {
-    return selectedLedIndices.isEmpty() || selectedLedIndices.contains(ledIndex);
+    if (!selectedLedIndices.isEmpty()) {
+        return selectedLedIndices;
+    }
+
+    QVector<int> allLedIndices;
+    for (int ledIndex = 0; ledIndex < LED_COUNT; ++ledIndex) {
+        allLedIndices.append(ledIndex);
+    }
+    return allLedIndices;
 }
 }
 
@@ -31,12 +38,12 @@ QVector<double> runFminconOptimization(const QString &csvFilePath, int illuminan
 {
     QVector<double> outputWeights;
     
-    // As seen in the MATLAB generated signature:
-    // led_wls is 81x1 (81 elements)
-    // led_spd is 81x22 (1782 elements, COLUMN-MAJOR)
+    // MATLAB Coder inputs: led_wls is 81x1, while led_spd is an 81xN
+    // column-major matrix containing only the selected LED columns.
     double led_wls[WLS_COUNT] = {0};
-    double led_spd[WLS_COUNT * LED_COUNT] = {0}; // itt lehetne dinamikusan allokálva a tömb
-    double weights[LED_COUNT] = {0};
+    const QVector<int> activeLeds = activeLedIndices(selectedLedIndices);
+    QVector<double> led_spd(WLS_COUNT * activeLeds.size(), 0.0);
+    QVector<double> weights(activeLeds.size(), 0.0);
 
     // 1. Read CSV File
     QFile file(csvFilePath);
@@ -94,13 +101,13 @@ QVector<double> runFminconOptimization(const QString &csvFilePath, int illuminan
             found++;
         }
 
-        for (int ledIdx = 0; ledIdx < LED_COUNT; ++ledIdx) {
+        // Copy selected LED spectra into compact columns while preserving their original CSV indices.
+        for (int selectedPosition = 0; selectedPosition < activeLeds.size(); ++selectedPosition) {
+            const int ledIdx = activeLeds.at(selectedPosition);
             QString valStr = tokens[ledIdx + 1].trimmed();
             if (decimalSeparator != '.') valStr.replace(decimalSeparator, '.');
-            int flatIndex = (ledIdx * WLS_COUNT) + idx;
-            led_spd[flatIndex] = isLedSelected(ledIdx, selectedLedIndices)
-                ? valStr.toDouble()
-                : 0.0; // dobja ki a led oszlopokat, ha nincsenek kiválasztva
+            int flatIndex = (selectedPosition * WLS_COUNT) + idx;
+            led_spd[flatIndex] = valStr.toDouble();
         }
     }
     file.close();
@@ -109,19 +116,27 @@ QVector<double> runFminconOptimization(const QString &csvFilePath, int illuminan
     optimize_led_weights_initialize();
 
     // 3. Call the generated function
+    // MATLAB Coder requires runtime shape metadata for variable-size arrays.
+    int ledSpdSize[2] = {WLS_COUNT, static_cast<int>(activeLeds.size())};
+    int weightsSize[2] = {1, static_cast<int>(activeLeds.size())};
     optimize_led_weights(
-        led_spd, 
+        led_spd.data(),
+        ledSpdSize,
         led_wls, 
         static_cast<double>(illuminantType), 
-        weights
+        weights.data(),
+        weightsSize
     );
 
     // 4. Terminate the MATLAB runtime
     optimize_led_weights_terminate();
 
     // 5. Store the weights
-    for (int i = 0; i < LED_COUNT; ++i) {
-        outputWeights.append(weights[i]);
+    outputWeights.fill(0.0, LED_COUNT);
+
+    for (int selectedPosition = 0; selectedPosition < activeLeds.size(); ++selectedPosition) {
+        const int ledIdx = activeLeds.at(selectedPosition);
+        outputWeights[ledIdx] = weights.at(selectedPosition);
     }
 
     qDebug() << "Optimization finished! Weights returned." << outputWeights;
@@ -142,7 +157,8 @@ EvaluatedMetrics runMetricsEvaluation(const QVector<double> &weights, const QStr
 
     double in_weights[LED_COUNT] = {0};
     double led_wls[WLS_COUNT] = {0};
-    double led_spd[WLS_COUNT * LED_COUNT] = {0};
+    const QVector<int> activeLeds = activeLedIndices(selectedLedIndices);
+    QVector<double> led_spd(WLS_COUNT * activeLeds.size(), 0.0);
 
     // Copy QVector to double array
     for (int i = 0; i < LED_COUNT; ++i) {
@@ -199,13 +215,12 @@ EvaluatedMetrics runMetricsEvaluation(const QVector<double> &weights, const QStr
             found++;
         }
 
-        for (int ledIdx = 0; ledIdx < LED_COUNT; ++ledIdx) {
+        for (int selectedPosition = 0; selectedPosition < activeLeds.size(); ++selectedPosition) {
+            const int ledIdx = activeLeds.at(selectedPosition);
             QString valStr = tokens[ledIdx + 1].trimmed();
             if (decimalSeparator != '.') valStr.replace(decimalSeparator, '.');
-            int flatIndex = (ledIdx * WLS_COUNT) + idx;
-            led_spd[flatIndex] = isLedSelected(ledIdx, selectedLedIndices)
-                ? valStr.toDouble()
-                : 0.0;
+            int flatIndex = (selectedPosition * WLS_COUNT) + idx;
+            led_spd[flatIndex] = valStr.toDouble();
         }
     }
     file.close();
@@ -215,8 +230,9 @@ EvaluatedMetrics runMetricsEvaluation(const QVector<double> &weights, const QStr
     double weighted_spd[WLS_COUNT] = {0};
     for (int wlIdx = 0; wlIdx < WLS_COUNT; ++wlIdx) {
         double sum = 0.0;
-        for (int ledIdx = 0; ledIdx < LED_COUNT; ++ledIdx) {
-            int flatIndex = (ledIdx * WLS_COUNT) + wlIdx;
+        for (int selectedPosition = 0; selectedPosition < activeLeds.size(); ++selectedPosition) {
+            const int ledIdx = activeLeds.at(selectedPosition);
+            int flatIndex = (selectedPosition * WLS_COUNT) + wlIdx;
             sum += in_weights[ledIdx] * led_spd[flatIndex];
         }
         weighted_spd[wlIdx] = sum;
@@ -227,11 +243,20 @@ EvaluatedMetrics runMetricsEvaluation(const QVector<double> &weights, const QStr
 
     double test_spd_arr[81] = {0};
     double ref_spd_arr[81] = {0};
+    QVector<double> selectedWeights(activeLeds.size(), 0.0);
+    for (int selectedPosition = 0; selectedPosition < activeLeds.size(); ++selectedPosition) {
+        selectedWeights[selectedPosition] = in_weights[activeLeds.at(selectedPosition)];
+    }
 
     // 3. Call the generated evaluate function
+    // These dimensions describe the compact selected-LED arrays passed to MATLAB.
+    int ledSpdSize[2] = {WLS_COUNT, static_cast<int>(activeLeds.size())};
+    int weightsSize[2] = {1, static_cast<int>(activeLeds.size())};
     evaluate_metrics(
-        in_weights,
-        led_spd, 
+        selectedWeights.data(),
+        weightsSize,
+        led_spd.data(),
+        ledSpdSize,
         led_wls, 
         static_cast<double>(illuminantType), 
         &outputMetrics.Mu, 

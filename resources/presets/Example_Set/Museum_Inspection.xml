@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightBoxPresets>
+    <Violet>0</Violet>
+    <Royal_Blue>8</Royal_Blue>
+    <Blue>12</Blue>
+    <Cyan>14</Cyan>
+    <Green>24</Green>
+    <Lime>18</Lime>
+    <Mint>10</Mint>
+    <PC_Amber>6</PC_Amber>
+    <Amber>2</Amber>
+    <Red_Orange>1</Red_Orange>
+    <Red>3</Red>
+    <Deep_Red>1</Deep_Red>
+    <Far_Red>0</Far_Red>
+    <UV_345>0</UV_345>
+    <UV_365>0</UV_365>
+    <UV_385>0</UV_385>
+    <UV_395>0</UV_395>
+    <UV_405>0</UV_405>
+    <UV_415>0</UV_415>
+    <Warm_White>18</Warm_White>
+    <Neutral_White>68</Neutral_White>
+    <Cool_White>12</Cool_White>
+</LightBoxPresets>

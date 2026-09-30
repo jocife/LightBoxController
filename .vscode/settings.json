@@ -1,0 +1,8 @@
+{
+  "cmake.configureArgs":[
+    "-DCMAKE_PREFIX_PATH=C:\\Qt\\6.10.2\\msvc2022_64",
+    "-T host=x64"
+  ],
+  "cmake.exportCompileCommandsFile":true,
+  "C_Cpp.default.configurationProvider":"ms-vscode.cmake-tools"
+}

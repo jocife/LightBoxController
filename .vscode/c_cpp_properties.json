@@ -1,0 +1,9 @@
+{
+    "configurations": [
+        {
+            "name": "CMake-Qt",
+            "configurationProvider": "ms-vscode.cmake-tools"
+        }
+    ],
+    "version": 4
+}

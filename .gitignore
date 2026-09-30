@@ -1,0 +1,28 @@
+bin/*
+!bin/.gitkeep
+
+build/*
+!build/.gitkeep
+
+include/*
+!include/.gitkeep
+
+lib/*
+!lib/.gitkeep
+
+# MATLAB
+*.asv          # Autosave files
+*.mexw64       # Compiled MEX files (Windows)
+*.mexa64       # Compiled MEX files (Linux)
+*.mexmaci64    # Compiled MEX files (Mac)
+
+# Ignore generated C/C++ code and DLLs from MATLAB Coder
+matlab/codegen/
+
+# Ignore large datasets or temporary output data (adjust as needed)
+matlab/build_data/output/*
+!matlab/build_data/output/.gitkeep
+
+resources/logs/*
+!resources/logs/.gitkeep
+

@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Cie1931PageWidget</class>
+ <widget class="QWidget" name="Cie1931PageWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>CIE 1931 Configuration</string>
+  </property>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>70</y>
+     <width>83</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Calculate</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>40</y>
+     <width>63</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>X Value</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>70</y>
+     <width>63</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Y Value</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="doubleSpinBox">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>40</y>
+     <width>67</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <double>1.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.010000000000000</double>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>70</y>
+     <width>67</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <double>1.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.010000000000000</double>
+   </property>
+  </widget>
+  <widget class="QWidget" name="gridLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>20</y>
+     <width>661</width>
+     <height>411</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayoutPageCIE1931"/>
+  </widget>
+  <widget class="QListWidget" name="listWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>20</y>
+     <width>211</width>
+     <height>411</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Violet</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Royal Blue</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Blue</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Cyan</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Green</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Lime</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Mint</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>PC Amber</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Amber</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Red Orange</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Red</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Deep Red</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Far Red</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UV 345</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UV 365</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UV 385</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UV 395</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UV 405</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UV 415</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Warm White</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Netural White</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Cool White</string>
+    </property>
+    <property name="checkState">
+     <enum>Checked</enum>
+    </property>
+   </item>
+  </widget>
+  <widget class="QWidget" name="gridLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>229</x>
+     <y>109</y>
+     <width>291</width>
+     <height>321</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayoutPageCIE1931_2"/>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

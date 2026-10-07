@@ -1,6 +1,25 @@
 cmake_minimum_required(VERSION 3.16)
-set(LightBoxController_VERSION "1.1.1")
-project(LightBoxController VERSION ${LightBoxController_VERSION} LANGUAGES CXX)
+# Extract version dynamically from Git tags
+find_package(Git QUIET)
+if(GIT_FOUND)
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        OUTPUT_VARIABLE GIT_TAG
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+endif()
+
+if(NOT GIT_TAG)
+    set(GIT_TAG "v1.0.0") # Fallback if no tags exist
+endif()
+
+# CMake's project() command requires a purely numeric version format (X.Y.Z)
+# So we strip the 'v' prefix if it exists (e.g. 'v1.1.1' -> '1.1.1')
+string(REGEX REPLACE "^v" "" NUMERIC_VERSION "${GIT_TAG}")
+
+project(LightBoxController VERSION ${NUMERIC_VERSION} LANGUAGES CXX)
 
 # --- Output Directorys ---
 # Forces all compiled binaries (exe) to separated output directories (Debug, Release)
@@ -181,7 +200,7 @@ if(WIN32)
     set(CPACK_GENERATOR "NSIS")
     set(CPACK_PACKAGE_NAME "LightBoxController")
     set(CPACK_PACKAGE_VENDOR "Your Company Name")
-    set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+    set(CPACK_PACKAGE_VERSION "${GIT_TAG}")
     
     # NSIS specific settings for installation path and UI names
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "LightBoxController")

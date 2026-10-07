@@ -205,8 +205,17 @@ if(WIN32)
     
     # NSIS specific settings for installation path and UI names
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "LightBoxController")
-    set(CPACK_NSIS_DISPLAY_NAME "LightBox Controller Application")
+    set(CPACK_NSIS_DISPLAY_NAME "LightBox Controller")
     set(CPACK_NSIS_INSTALLED_ICON_NAME "LightBoxController.exe")
+    set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "LightBox Controller")
+    
+    # Calculate and write the EstimatedSize to the Control Panel registry
+    set(CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS "!include \\\"FileFunc.nsh\\\"")
+    set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+        \\\${GetSize} \\\"\\\$INSTDIR\\\" \\\"/S=0K\\\" \\\$0 \\\$1 \\\$2
+        IntFmt \\\$0 \\\"0x%08X\\\" \\\$0
+        WriteRegDWORD HKLM \\\"Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Uninstall\\\\LightBox Controller\\\" \\\"EstimatedSize\\\" \\\"\\\$0\\\"
+    ")
     
     # Create Start Menu shortcut: "Executable name (without .exe)" "Shortcut name"
     set(CPACK_PACKAGE_EXECUTABLES "LightBoxController" "LightBox Controller")

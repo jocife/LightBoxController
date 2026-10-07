@@ -66,7 +66,7 @@ if (Test-Path $outputDir) {
 }
 if (-not $SkipConfigure) {
     if (Test-Path $buildDir) {
-        Remove-Item $buildDir -Recurse -Force
+        Get-ChildItem -Path $buildDir -Force -Exclude ".gitkeep" | Remove-Item -Recurse -Force
     }
 }
 

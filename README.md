@@ -403,10 +403,11 @@ Rebuilds the Release executable from source and packages it for distribution:
 Automatically builds the application, generates the Windows installer, and uploads it to GitHub as a new release. Requires the [GitHub CLI](#5-publishing-tools) to be authenticated.
 
 **Best Practice Workflow:**
-1. Commit your final changes and push to GitHub: `git push`
-2. Create your new release tag locally: `git tag v1.2.0`
-3. Push your tag to GitHub: `git push --tags`
-4. Run the publish script:
+1. Commit your final changes: `git commit -m "your message"`
+2. Push your commits to GitHub: `git push`
+3. Create your new release tag locally: `git tag v1.2.0`
+4. Push your tag to GitHub: `git push --tags`
+5. Run the publish script:
    ```powershell
    .\scripts\publish_release.ps1
    ```

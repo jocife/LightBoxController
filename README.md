@@ -54,6 +54,8 @@ You can download the latest pre-built Windows installer (.exe) from the **[GitHu
 
 Otherwise, if you wish to build it yourself, refer to the [Developer Guide](#developer-guide) to build the application from source and generate an installer.
 
+> **Note on Windows SmartScreen:** Because this is an academic open-source project without a paid EV Code Signing Certificate, Windows Defender SmartScreen may display an "Unknown Publisher" warning when you run the installer. To bypass this safely, click **More info** and then select **Run anyway**.
+
 #### Using the Application
 Once the application is installed and running, you can interact with the lightbox using the main functional tabs:
 1. **Connection**: Connect to the lightbox hardware over a TCP connection.

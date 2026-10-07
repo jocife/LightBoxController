@@ -14,13 +14,25 @@
       - [Uninstalling the Application](#uninstalling-the-application)
     - [Developer Guide](#developer-guide)
       - [Prerequisites](#prerequisites)
+        - [1. C++ Compiler \& Qt Framework](#1-c-compiler--qt-framework)
+        - [2. Build \& Packaging Tools](#2-build--packaging-tools)
+        - [3. MATLAB Environment](#3-matlab-environment)
+        - [4. Development \& Debugging](#4-development--debugging)
+        - [5. Publishing Tools](#5-publishing-tools)
       - [Getting Started](#getting-started)
       - [How to use MATLAB Coder](#how-to-use-matlab-coder)
-      - [Quick Build & Run Scripts](#quick-build--run-scripts)
+        - [Automated Build (Recommended)](#automated-build-recommended)
+        - [Manual Build (Alternative)](#manual-build-alternative)
+      - [Quick Build \& Run Scripts](#quick-build--run-scripts)
+        - [`update_project.ps1` — Complete Project Update (Recommended)](#update_projectps1--complete-project-update-recommended)
+        - [`update_matlab.ps1` — MATLAB Build Only](#update_matlabps1--matlab-build-only)
+        - [`update_qt.ps1` — Qt Build \& Run Only](#update_qtps1--qt-build--run-only)
+        - [`build_release_exe.ps1` — Release Rebuild \& Packaging](#build_release_exeps1--release-rebuild--packaging)
+        - [`publish_release.ps1` — GitHub Release Automation](#publish_releaseps1--github-release-automation)
   - [Project Structure](#project-structure)
     - [Key Directories in Detail:](#key-directories-in-detail)
   - [Themes](#themes)
-  - [Attributions & Assets](#attributions--assets)
+  - [Attributions \& Assets](#attributions--assets)
   - [License](#license)
 
 ## Overview
@@ -38,7 +50,9 @@ This application is used to control a specific lightbox and is built with C++ us
 ### User Guide
 
 #### Installing the Application
-If you have a pre-built Windows installer (.exe), simply run it and follow the on-screen prompts. Otherwise, refer to the [Developer Guide](#developer-guide) to build the application from source and generate an installer.
+You can download the latest pre-built Windows installer (.exe) from the **[GitHub Releases page](https://github.com/jocife/LightBoxController/releases/latest)**. Simply run the downloaded installer and follow the on-screen prompts. 
+
+Otherwise, if you wish to build it yourself, refer to the [Developer Guide](#developer-guide) to build the application from source and generate an installer.
 
 #### Using the Application
 Once the application is installed and running, you can interact with the lightbox using the main functional tabs:
@@ -109,6 +123,14 @@ Ensure you have the following software and tools installed before building the p
 
 - **[Hercules](https://www.hw-group.com/software/hercules-setup-utility/)** (Local TCP Server for connection debugging)
   > **Configuration:** Open *Hercules* &rarr; TCP Server &rarr; Server Status &rarr; Set Port to `1234` &rarr; Listen.
+
+
+##### 5. Publishing Tools
+- **[GitHub CLI (gh)](https://cli.github.com/)** (Required to automate creating and publishing GitHub Releases)
+  ```powershell
+  winget install -e --id=GitHub.cli
+  ```
+  > **Configuration:** After installing, open your terminal and run `gh auth login` to authenticate with your GitHub account.
 
 ---
 
@@ -375,6 +397,24 @@ Rebuilds the Release executable from source and packages it for distribution:
 - `-SkipInstaller`: Build the Release executable without generating the installer
   ```powershell
   .\scripts\build_release_exe.ps1 -SkipInstaller
+  ```
+
+##### `publish_release.ps1` — GitHub Release Automation
+Automatically builds the application, generates the Windows installer, and uploads it to GitHub as a new release. Requires the [GitHub CLI](#5-publishing-tools) to be authenticated.
+
+```powershell
+.\scripts\publish_release.ps1 -Tag v1.1.0
+```
+
+**What it does:**
+1. Ensures the release executable and NSIS installer are freshly built.
+2. Extracts the application version from CMakeLists.txt.
+3. Invokes the GitHub CLI to publish the release with auto-generated notes and attaches the installer .exe.
+
+**Optional parameters:**
+- -SkipBuild: Skips the build process and only attempts to publish the existing installer.
+  ```powershell
+  .\scripts\publish_release.ps1 -Tag v1.1.0 -SkipBuild
   ```
 
 **Example workflows:**

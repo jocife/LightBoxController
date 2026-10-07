@@ -199,7 +199,7 @@ endif()
 if(WIN32)
     set(CPACK_GENERATOR "NSIS")
     set(CPACK_PACKAGE_NAME "LightBoxController")
-    set(CPACK_PACKAGE_VENDOR "Your Company Name")
+    set(CPACK_PACKAGE_VENDOR "BME MOGI")
     set(CPACK_PACKAGE_VERSION "${GIT_TAG}")
     
     # NSIS specific settings for installation path and UI names

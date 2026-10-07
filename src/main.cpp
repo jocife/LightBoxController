@@ -6,7 +6,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    a.setWindowIcon(QIcon(QCoreApplication::applicationDirPath() + "/images/led-gui.ico"));
+    a.setWindowIcon(QIcon(QCoreApplication::applicationDirPath() + "/icons/lightboxcontroller.ico"));
 
     LightBoxController w;
     QFile styleSheetFile(w.getThemeFileAbsolutePath());

@@ -21,6 +21,10 @@ QVector<double> runFminconOptimization(const QString &csvFilePath, int illuminan
                                      QChar decimalSeparator = ',', QChar colSeparator = ';',
                                      const QVector<int> &selectedLedIndices = {});
 
+QVector<double> runChromaticityTargetOptimization(const QString &csvFilePath, double targetU, double targetV,
+                                                  QChar decimalSeparator = ',', QChar colSeparator = ';',
+                                                  const QVector<int> &selectedLedIndices = {});
+
 EvaluatedMetrics runMetricsEvaluation(const QVector<double> &weights, const QString &csvFilePath, 
                                       int illuminantType, QChar decimalSeparator = ',', QChar colSeparator = ';',
                                       const QVector<int> &selectedLedIndices = {});

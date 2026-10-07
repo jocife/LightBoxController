@@ -18,10 +18,11 @@ class LedControlPageWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit LedControlPageWidget(const QString& configsFolderAbsolutePath, const QString& presetsFolderAbsolutePath, QWidget *parent = nullptr);
+    explicit LedControlPageWidget(const QString& configsFolderAbsolutePath, const QString& presetsFolderAbsolutePath,
+                                  const QString& ledSpdFolderAbsolutePath, QWidget *parent = nullptr);
     ~LedControlPageWidget();
 
-    // Expose widgets for other tabs (like Presets & CIE1931) that need to read from/write to them
+    // Expose widgets for other tabs (like Presets & CIE1976) that need to read from/write to them
     const QList<LEDControllerWidget*>& getLedControllers() const { return ledControllerWidgetList; }
 
     void setGlobalDimming(int left, int right);
@@ -30,6 +31,7 @@ public:
     void setAutoSendEnabled(bool enabled);
 
 public slots:
+    void setLedSPDsFolder(const QString& folderPath);
     void triggerSend();
     void triggerSymmetric(bool symmetric);
     

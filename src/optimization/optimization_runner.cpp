@@ -144,6 +144,82 @@ QVector<double> runFminconOptimization(const QString &csvFilePath, int illuminan
     return outputWeights;
 }
 
+QVector<double> runChromaticityTargetOptimization(const QString &csvFilePath, double targetU, double targetV,
+                                                  QChar decimalSeparator, QChar colSeparator,
+                                                  const QVector<int> &selectedLedIndices)
+{
+    QVector<double> outputWeights;
+    if (targetU < 0.0 || targetV < 0.0 || targetU > 1.0 || targetV > 1.0) {
+        qWarning() << "Invalid CIE 1976 chromaticity target:" << targetU << targetV;
+        return outputWeights;
+    }
+
+    double led_wls[WLS_COUNT] = {0};
+    const QVector<int> activeLeds = activeLedIndices(selectedLedIndices);
+    if (activeLeds.isEmpty()) {
+        return outputWeights;
+    }
+    QVector<double> led_spd(WLS_COUNT * activeLeds.size(), 0.0);
+
+    QFile file(csvFilePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Failed to open CSV for CIE 1976 optimization:" << csvFilePath;
+        return outputWeights;
+    }
+
+    QTextStream in(&file);
+    if (!in.atEnd()) {
+        in.readLine();
+    }
+    int found = 0;
+    while (!in.atEnd() && found < WLS_COUNT) {
+        const QStringList tokens = in.readLine().split(colSeparator);
+        if (tokens.size() < LED_COUNT + 1) {
+            continue;
+        }
+        QString wavelengthText = tokens.at(0).trimmed();
+        if (decimalSeparator != '.') {
+            wavelengthText.replace(decimalSeparator, '.');
+        }
+        bool wavelengthOk = false;
+        const double wavelength = wavelengthText.toDouble(&wavelengthOk);
+        if (!wavelengthOk || wavelength < 380.0 || wavelength > 780.0) {
+            continue;
+        }
+        const double gridIndex = (wavelength - 380.0) / 5.0;
+        const int index = qRound(gridIndex);
+        if (qAbs(gridIndex - index) > 1e-6 || index < 0 || index >= WLS_COUNT) {
+            continue;
+        }
+        if (led_wls[index] == 0.0) {
+            led_wls[index] = wavelength;
+            ++found;
+        }
+        for (int selectedPosition = 0; selectedPosition < activeLeds.size(); ++selectedPosition) {
+            QString valueText = tokens.at(activeLeds.at(selectedPosition) + 1).trimmed();
+            if (decimalSeparator != '.') {
+                valueText.replace(decimalSeparator, '.');
+            }
+            led_spd[selectedPosition * WLS_COUNT + index] = valueText.toDouble();
+        }
+    }
+    file.close();
+
+    QVector<double> weights(activeLeds.size(), 0.0);
+    int ledSpdSize[2] = {WLS_COUNT, activeLeds.size()};
+    int weightsSize[2] = {1, activeLeds.size()};
+    optimize_led_weights_initialize();
+    optimize_chromaticity_weights(led_spd.data(), ledSpdSize, led_wls, targetU, targetV,
+                                  weights.data(), weightsSize);
+    optimize_led_weights_terminate();
+
+    outputWeights.fill(0.0, LED_COUNT);
+    for (int selectedPosition = 0; selectedPosition < activeLeds.size(); ++selectedPosition) {
+        outputWeights[activeLeds.at(selectedPosition)] = weights.at(selectedPosition);
+    }
+    return outputWeights;
+}
+
 EvaluatedMetrics runMetricsEvaluation(const QVector<double> &weights, const QString &csvFilePath, 
                                       int illuminantType, QChar decimalSeparator, QChar colSeparator,
                                       const QVector<int> &selectedLedIndices)
@@ -278,7 +354,7 @@ EvaluatedMetrics runMetricsEvaluation(const QVector<double> &weights, const QStr
     // 4. Terminate the MATLAB runtime
     optimize_led_weights_terminate();
 
-    qDebug() << "Metrics evaluation finished! Mu:" << outputMetrics.Mu << "Mv:" << outputMetrics.Mv 
+    qDebug() << "Metrics evaluation finished! Mu:" << outputMetrics.Mu << "Mv:" << outputMetrics.Mv
              << "Duv:" << outputMetrics.Duv << "CRI:" << outputMetrics.CRI << "CCT:" << outputMetrics.CCT;
              
     return outputMetrics;

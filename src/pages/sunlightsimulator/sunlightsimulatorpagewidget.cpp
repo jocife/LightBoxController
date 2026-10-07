@@ -8,9 +8,10 @@
 #include <QtCharts/QLegendMarker>
 #include <QBrush>
 
-SunlightSimulatorPageWidget::SunlightSimulatorPageWidget(QWidget *parent)
+SunlightSimulatorPageWidget::SunlightSimulatorPageWidget(const QString& calibrationFile, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::SunlightSimulatorPageWidget)
+    , calibrationFilePath(calibrationFile)
     , m_chart(new QChart())
     , m_testSeries(new QLineSeries())
     , m_refSeries(new QLineSeries())
@@ -32,6 +33,11 @@ SunlightSimulatorPageWidget::SunlightSimulatorPageWidget(QWidget *parent)
 SunlightSimulatorPageWidget::~SunlightSimulatorPageWidget()
 {
     delete ui;
+}
+
+void SunlightSimulatorPageWidget::setCalibrationFile(const QString& filePath)
+{
+    calibrationFilePath = filePath;
 }
 
 void SunlightSimulatorPageWidget::populateLeds()
@@ -126,15 +132,15 @@ void SunlightSimulatorPageWidget::setupChart()
 
 void SunlightSimulatorPageWidget::triggerCalculate()
 {
-    emit logMessage("SunlightSimulatorPage", "Calculating values for " + ui->comboBoxIlluminant->currentText());
+    emit logMessage("Sunlight Simulator", "Calculating values for " + ui->comboBoxIlluminant->currentText());
 
     const QVector<int> selectedLeds = selectedLedIndices();
     if (selectedLeds.isEmpty()) {
-        emit logMessage("SunlightSimulatorPage", "Select at least one LED before calculating.");
+        emit logMessage("Sunlight Simulator", "Select at least one LED before calculating.");
         return;
     }
 
-    QString csvPath = QCoreApplication::applicationDirPath() + "/configs/LED_SPD_CALIBRATION.csv";
+    const QString csvPath = calibrationFilePath;
     int illuminantIndex = ui->comboBoxIlluminant->currentIndex(); // 0 for D50, 1 for D55, 2 for D65, etc.
 
     // 1. Run MATLAB algorithm to get optimal weights
@@ -156,7 +162,7 @@ void SunlightSimulatorPageWidget::triggerCalculate()
 void SunlightSimulatorPageWidget::triggerSave()
 {
     if (m_lastWeights.size() != 22) {
-        emit logMessage("SunlightSimulatorPage", "Calculate the sunlight simulation before saving.");
+        emit logMessage("Sunlight Simulator", "Calculate the sunlight simulation before saving.");
         return;
     }
 
@@ -174,10 +180,10 @@ void SunlightSimulatorPageWidget::triggerSave()
 
     QString errorMessage;
     if (!PresetFileManager::save(filePath, values, &errorMessage)) {
-        emit logMessage("SunlightSimulatorPage", "Failed to open file for saving.");
+        emit logMessage("Sunlight Simulator", "Failed to open file for saving.");
         return;
     }
-    emit logMessage("SunlightSimulatorPage", "Saved preset: " + filePath);
+    emit logMessage("Sunlight Simulator", "Saved preset: " + filePath);
 }
 
 void SunlightSimulatorPageWidget::updateLabels(double mu, double mv, double duv, double cri, double cct)

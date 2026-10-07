@@ -3,18 +3,18 @@
 #include "presetfilemanager.h"
 #include <QDebug>
 
-LedControlPageWidget::LedControlPageWidget(const QString& configsFolder, const QString& presetsFolder, QWidget *parent)
+LedControlPageWidget::LedControlPageWidget(const QString& configsFolder, const QString& presetsFolder,
+                                           const QString& ledSpdFolder, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::LedControlPageWidget)
     , configsFolderPath(configsFolder)
     , presetsFolderPath(presetsFolder)
+    , ledSPDsFolderAbsolutePath(ledSpdFolder)
     , globalLeftValue(100)
     , globalRightValue(100)
     , autoSendEnabled(false)
 {
     ui->setupUi(this);
-
-    ledSPDsFolderAbsolutePath = configsFolderPath + "/LED_SPDs";
 
     QStringList ledNames = {
         "Violet", "Royal Blue", "Blue", "Cyan", "Green", "Lime", "Mint", 
@@ -43,6 +43,15 @@ LedControlPageWidget::~LedControlPageWidget()
     delete ui;
 }
 
+void LedControlPageWidget::setLedSPDsFolder(const QString& folderPath)
+{
+    ledSPDsFolderAbsolutePath = folderPath;
+    if (!QDir(ledSPDsFolderAbsolutePath).exists()) {
+        ledSPDsFolderAbsolutePath = QDir(configsFolderPath).absoluteFilePath("LED_SPDs");
+    }
+    readLedSPDs();
+}
+
 void LedControlPageWidget::readLedSPDs()
 {
     QString fileName = "";
@@ -54,13 +63,13 @@ void LedControlPageWidget::readLedSPDs()
         validFile = ledControllerWidget->readSPDDataFromCSV(ledSPDsFolderAbsolutePath + "/" + fileName, ';');
         
         if (!validFile) {
-            emit logMessage("LedControl", QString("<span style='color:red'>Error reading file: %1</span>").arg(fileName));
+            emit logMessage("LED Control", QString("<span style='color:red'>Error reading file: %1</span>").arg(fileName));
             allFilesLoadedSuccessfully = false;
         }
     }
     
     if (allFilesLoadedSuccessfully) {
-        emit logMessage("LedControl", "<span style='color:green'>All LED SPD CSV files successfully read in.</span>");
+        emit logMessage("LED Control", "<span style='color:green'>All LED SPD CSV files successfully read in.</span>");
     }
 }
 
@@ -135,10 +144,10 @@ void LedControlPageWidget::triggerSave()
 
     QString errorMessage;
     if (!PresetFileManager::save(filePath, values, &errorMessage)) {
-        emit logMessage("LedControl", "<span style='color:red'>Failed to open file for saving.</span>");
+        emit logMessage("LED Control", "<span style='color:red'>Failed to open file for saving.</span>");
         return;
     }
-    emit logMessage("LedControl", "Saved preset: " + filePath);
+    emit logMessage("LED Control", "Saved preset: " + filePath);
 }
 
 void LedControlPageWidget::triggerSaveLeft()
@@ -153,7 +162,7 @@ void LedControlPageWidget::triggerSaveLeft()
         values.append(ledControllerWidget->leftSliderValue());
 
     if (!PresetFileManager::save(filePath, values)) return;
-    emit logMessage("LedControl", "Saved left preset: " + filePath);
+    emit logMessage("LED Control", "Saved left preset: " + filePath);
 }
 
 void LedControlPageWidget::triggerSaveRight()
@@ -168,7 +177,7 @@ void LedControlPageWidget::triggerSaveRight()
         values.append(ledControllerWidget->rightSliderValue());
 
     if (!PresetFileManager::save(filePath, values)) return;
-    emit logMessage("LedControl", "Saved right preset: " + filePath);
+    emit logMessage("LED Control", "Saved right preset: " + filePath);
 }
 
 void LedControlPageWidget::triggerLoad()
@@ -184,7 +193,7 @@ void LedControlPageWidget::triggerLoad()
         ledControllerWidgetList[row]->leftSliderSetValue(values.at(row));
 
     emit ledValuesChanged();
-    emit logMessage("LedControl", "Loaded preset: " + filePath);
+    emit logMessage("LED Control", "Loaded preset: " + filePath);
     if (autoSendEnabled) triggerSend();
 }
 

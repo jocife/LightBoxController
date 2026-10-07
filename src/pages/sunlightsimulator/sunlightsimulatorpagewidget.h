@@ -19,12 +19,13 @@ class SunlightSimulatorPageWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit SunlightSimulatorPageWidget(QWidget *parent = nullptr);
+    explicit SunlightSimulatorPageWidget(const QString& calibrationFile, QWidget *parent = nullptr);
     ~SunlightSimulatorPageWidget();
 
 public slots:
     void triggerCalculate();
     void triggerSave();
+    void setCalibrationFile(const QString& filePath);
 
 signals:
     // Forwards log messages to the main controller's log panel
@@ -32,6 +33,7 @@ signals:
 
 private:
     Ui::SunlightSimulatorPageWidget *ui;
+    QString calibrationFilePath;
     
     QChart *m_chart;
     QLineSeries *m_testSeries;

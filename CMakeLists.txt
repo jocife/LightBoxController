@@ -33,26 +33,28 @@ set(SOURCES
     src/pages/connection/connectionpagewidget.cpp
     src/pages/ledcontrol/ledcontrolpagewidget.cpp
     src/pages/presets/presetspagewidget.cpp
-    src/pages/cie1931/cie1931pagewidget.cpp
+    src/pages/cie1976/cie1976pagewidget.cpp
     src/pages/sunlightsimulator/sunlightsimulatorpagewidget.cpp
     src/components/ledcontrollerwidget.cpp
     src/components/presetfilemanager.cpp
     src/optimization/optimization_runner.cpp
     src/app/lightboxcontroller.cpp
+    src/app/configurationdialog.cpp
     src/main.cpp
     src/pages/connection/connectionpagewidget.h
     src/pages/ledcontrol/ledcontrolpagewidget.h
     src/pages/presets/presetspagewidget.h
-    src/pages/cie1931/cie1931pagewidget.h
+    src/pages/cie1976/cie1976pagewidget.h
     src/pages/sunlightsimulator/sunlightsimulatorpagewidget.h
     src/components/ledcontrollerwidget.h
     src/components/presetfilemanager.h
     src/optimization/optimization_runner.h
     src/app/lightboxcontroller.h
+    src/app/configurationdialog.h
     src/pages/connection/connectionpagewidget.ui
     src/pages/ledcontrol/ledcontrolpagewidget.ui
     src/pages/presets/presetspagewidget.ui
-    src/pages/cie1931/cie1931pagewidget.ui
+    src/pages/cie1976/cie1976pagewidget.ui
     src/pages/sunlightsimulator/sunlightsimulatorpagewidget.ui
     src/app/lightboxcontroller.ui
 )
@@ -65,7 +67,7 @@ include_directories(
     src/pages/connection
     src/pages/ledcontrol
     src/pages/presets
-    src/pages/cie1931
+    src/pages/cie1976
     src/pages/sunlightsimulator
     src/components
     src/optimization
@@ -73,7 +75,7 @@ include_directories(
 
 # Define the executable (Defaults to Console subsystem for debugging)
 if(WIN32)
-    list(APPEND SOURCES src/app/led_gui.rc)
+    list(APPEND SOURCES resources/icons/lightboxcontroller.rc)
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -195,4 +197,3 @@ if(WIN32)
     
     include(CPack)
 endif()
-

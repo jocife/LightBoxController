@@ -17,11 +17,15 @@ class ConnectionPageWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ConnectionPageWidget(const QString& imagesFolderAbsolutePath, QWidget *parent = nullptr);
+    explicit ConnectionPageWidget(const QString& imagesFolderAbsolutePath, const QString& hostAddress,
+                                  qint16 hostPort, const QString& wifiSsid, const QString& wifiPassword,
+                                  QWidget *parent = nullptr);
     ~ConnectionPageWidget();
 
     // Used by LightBoxController to forward data from other tabs to the socket
     void sendData(const QByteArray& data);
+    void setConnectionSettings(const QString& hostAddress, qint16 hostPort,
+                               const QString& wifiSsid, const QString& wifiPassword);
 
 signals:
     // Emitted when connection state changes, so LightBoxController knows if it's connected
@@ -47,19 +51,18 @@ private:
     //const qint16 HostPORT = 1234;
 
     // For actual hardware connection, use the following settings:
-    const QString HostIP = "192.168.4.1";
-    const qint16 HostPORT = 5001;
-
-    const QString WIFI_SSID = "LightBooth-WiFi";
-    const QString WIFI_PASSWORD = "thereisnospoon";
+    QString hostIp;
+    qint16 hostPort;
+    QString wifiSsid;
+    QString wifiPassword;
 
     QLabel *labelWifiSSID;
     QLabel *labelWifiPassword;
     QLabel *labelTcpSocketStateSymbol;
     QLabel *labelTcpSocketState;
-    QLabel *labelDisplayLightCabinet;
+    QLabel *labelDisplayLightBox;
 
-    QImage *imageLightCabinet;
+    QImage *imageLightBox;
     QGridLayout *gridLayoutTcpSocketState;
 
     QPushButton *pushButtonConnect;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Cie1931PageWidget</class>
- <widget class="QWidget" name="Cie1931PageWidget">
+ <class>Cie1976PageWidget</class>
+ <widget class="QWidget" name="Cie1976PageWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,13 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>CIE 1931 Configuration</string>
+   <string>CIE 1976 Configuration</string>
   </property>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="pushButtonCalculate">
    <property name="geometry">
     <rect>
-     <x>410</x>
-     <y>70</y>
+     <x>425</x>
+     <y>40</y>
      <width>83</width>
      <height>29</height>
     </rect>
@@ -26,7 +26,20 @@
     <string>Calculate</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QPushButton" name="pushButtonSave">
+   <property name="geometry">
+    <rect>
+     <x>425</x>
+     <y>70</y>
+     <width>83</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelU">
    <property name="geometry">
     <rect>
      <x>250</x>
@@ -36,10 +49,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>X Value</string>
+    <string>u' Value</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QLabel" name="labelV">
    <property name="geometry">
     <rect>
      <x>250</x>
@@ -49,53 +62,71 @@
     </rect>
    </property>
    <property name="text">
-    <string>Y Value</string>
+    <string>v' Value</string>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBox">
+  <widget class="QDoubleSpinBox" name="doubleSpinBoxU">
    <property name="geometry">
     <rect>
      <x>320</x>
      <y>40</y>
-     <width>67</width>
+     <width>95</width>
      <height>29</height>
     </rect>
    </property>
+   <property name="decimals">
+    <number>5</number>
+   </property>
+   <property name="minimum">
+    <double>0.001050000000000</double>
+   </property>
    <property name="maximum">
-    <double>1.000000000000000</double>
+    <double>0.623370000000000</double>
    </property>
    <property name="singleStep">
     <double>0.010000000000000</double>
    </property>
+   <property name="value">
+    <double>0.197900000000000</double>
+   </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+  <widget class="QDoubleSpinBox" name="doubleSpinBoxV">
    <property name="geometry">
     <rect>
      <x>320</x>
      <y>70</y>
-     <width>67</width>
+     <width>95</width>
      <height>29</height>
     </rect>
    </property>
+   <property name="decimals">
+    <number>5</number>
+   </property>
+   <property name="minimum">
+    <double>0.017550000000000</double>
+   </property>
    <property name="maximum">
-    <double>1.000000000000000</double>
+    <double>0.595320000000000</double>
    </property>
    <property name="singleStep">
     <double>0.010000000000000</double>
+   </property>
+   <property name="value">
+    <double>0.469500000000000</double>
    </property>
   </widget>
   <widget class="QWidget" name="gridLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>530</x>
+     <x>610</x>
      <y>20</y>
-     <width>661</width>
+     <width>580</width>
      <height>411</height>
     </rect>
    </property>
-   <layout class="QGridLayout" name="gridLayoutPageCIE1931"/>
+   <layout class="QGridLayout" name="gridLayoutPageCIE1976"/>
   </widget>
-  <widget class="QListWidget" name="listWidget">
+  <widget class="QListWidget" name="listWidgetLeds">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -266,7 +297,7 @@
    </item>
    <item>
     <property name="text">
-     <string>Netural White</string>
+     <string>Neutral White</string>
     </property>
     <property name="checkState">
      <enum>Checked</enum>
@@ -290,7 +321,7 @@
      <height>321</height>
     </rect>
    </property>
-   <layout class="QGridLayout" name="gridLayoutPageCIE1931_2"/>
+   <layout class="QGridLayout" name="gridLayoutPageCIE1976_2"/>
   </widget>
  </widget>
  <resources/>

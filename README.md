@@ -12,6 +12,8 @@
     - [4. Development \& Debugging](#4-development--debugging)
   - [Project Structure](#project-structure)
     - [Key Directories in Detail:](#key-directories-in-detail)
+  - [Themes](#themes)
+  - [Attributions \& Assets](#attributions--assets)
   - [Getting Started](#getting-started)
   - [How to use MATLAB Coder](#how-to-use-matlab-coder)
     - [Automated Build (Recommended)](#automated-build-recommended)
@@ -21,6 +23,7 @@
     - [`update_matlab.ps1` — MATLAB Build Only](#update_matlabps1--matlab-build-only)
     - [`build_release_exe.ps1` — Release Rebuild \& Packaging](#build_release_exeps1--release-rebuild--packaging)
     - [`publish_release.ps1` — Build \& Publish Forgejo Release](#publish_releaseps1--build--publish-forgejo-release)
+      - [Environment variable setup](#environment-variable-setup)
     - [`update_qt.ps1` — Qt Build \& Run Only](#update_qtps1--qt-build--run-only)
   - [Uninstalling the Application](#uninstalling-the-application)
   - [License](#license)
@@ -105,7 +108,7 @@ led-gui/
     ├── app/          # Main application window and orchestrator logic
     ├── components/   # Reusable UI widgets shared across multiple pages
     ├── optimization/ # Core C++ wrapper logic for interacting with external algorithms
-    ├── pages/        # The main application tabs (Connection, LED Control, Presets, CIE 1931)
+    ├── pages/        # The main application tabs (Connection, LED Control, Presets, CIE 1976)
     └── main.cpp      # Application entry point
 ```
 
@@ -113,6 +116,30 @@ led-gui/
 - **`matlab/`**: Contains the mathematical models and constraints for the LED light box. You must process these files with MATLAB Coder to generate the underlying C++ backend before building the UI.
 - **`src/`**: Houses all Qt-related code. It is cleanly modularized into `app` (the main window frame), `pages` (the individual functional tabs), and `components` (small, standalone widgets).
 - **`resources/`**: Includes necessary runtime data like CSV calibration files (`configs/`), saved parameters (`presets/`), and visual elements (`icons/`, `themes/`).
+
+---
+
+## Themes
+
+The Qt Style Sheet (QSS) themes included in `resources/themes/` are provided by
+[DevSec Studio](https://qss-stock.devsecstudio.com/). The original source and
+downloadable theme collection are available in the
+[QSS Stock gallery](https://qss-stock.devsecstudio.com/templates.php).
+
+The Diffnes theme used by this project is available here:
+
+- [Included `Diffnes.qss` file](resources/themes/Diffnes.qss)
+- [Download the original Diffnes theme](https://qss-stock.devsecstudio.com/templates/components/components3/diffnes/Diffnes.rar)
+
+The theme files retain their original copyright notice and MIT License.
+
+---
+
+## Attributions & Assets
+
+- **CIE 1976 UCS Chromaticity Diagram** (`resources/images/cie1976-chromaticity-diagram.jpg`):
+  - Source: [HyperPhysics — CIE 1976 Color Space](http://hyperphysics.phy-astr.gsu.edu/hbase/vision/cie1976.html)
+  - Hosted by: Department of Physics and Astronomy, Georgia State University (C. R. Nave).
 
 ---
 
@@ -377,7 +404,27 @@ The script:
 4. Calculates the installer SHA-256 checksum
 5. Creates the Forgejo release and uploads the installer
 
-The Forgejo API token is requested securely at runtime and is not stored in the repository. The token must have `write:repository` permission.
+The Forgejo API token is loaded from the `FORGEJO_API_TOKEN` environment variable and is not stored in the repository. The token must have `write:repository` permission.
+
+#### Environment variable setup
+
+Set the token for the current PowerShell session:
+
+```powershell
+$env:FORGEJO_API_TOKEN = "your-forgejo-api-token"
+```
+
+To persist it for your Windows user, set it outside the repository and open a new terminal afterward:
+
+```powershell
+[Environment]::SetEnvironmentVariable("FORGEJO_API_TOKEN", "your-forgejo-api-token", "User")
+```
+
+Publishing reads the token without prompting:
+
+```powershell
+.\scripts\publish_release.ps1 -Version 1.0.1
+```
 
 Use `-Draft` or `-Prerelease` when appropriate. To publish an already-built installer without rebuilding:
 
@@ -442,4 +489,3 @@ If you installed the application with the Windows installer, you can uninstall i
 
 This project is an academic research, open source and availabe under the [GNU General Public License v3.0](LICENSE).
 Feel free to modify, distribute, and use the app in accordance with the terms of the license.
-

@@ -5,6 +5,8 @@
 #include <QDateTime>
 #include <QFile>
 #include <QDebug>
+#include <QRegularExpression>
+#include <QSettings>
 
 LightBoxController::LightBoxController(QWidget *parent)
     : QMainWindow(parent)
@@ -19,9 +21,22 @@ LightBoxController::LightBoxController(QWidget *parent)
     themesFolderAbsolutePath = QDir(executableAbsolutePath).absoluteFilePath("themes");
     themeFileAbsolutePath = QDir(themesFolderAbsolutePath).absoluteFilePath("Diffnes.qss");
     configsFolderAbsolutePath = QDir(executableAbsolutePath).absoluteFilePath("configs");
-    ledSPDsFolderAbsolutePath = QDir(configsFolderAbsolutePath).absoluteFilePath("ledSPDs");
+    ledSPDsFolderAbsolutePath = QDir(configsFolderAbsolutePath).absoluteFilePath("LED_SPDs");
     logsFolderAbsolutePath = QDir(executableAbsolutePath).absoluteFilePath("logs");
     presetsFolderAbsolutePath = QDir(executableAbsolutePath).absoluteFilePath("presets");
+
+    QSettings settings("BME", "LED_GUI");
+    configurationValues.ledSpdFolder = settings.value("ledSpdFolder", ledSPDsFolderAbsolutePath).toString();
+    if (!QDir(configurationValues.ledSpdFolder).exists()) {
+        configurationValues.ledSpdFolder = ledSPDsFolderAbsolutePath;
+        settings.setValue("ledSpdFolder", configurationValues.ledSpdFolder);
+    }
+    configurationValues.calibrationFile = settings.value(
+        "calibrationFile", QDir(configsFolderAbsolutePath).absoluteFilePath("LED_SPD_CALIBRATION.csv")).toString();
+    configurationValues.wifiSsid = settings.value("wifiSsid", "LightBooth-WiFi").toString();
+    configurationValues.wifiPassword = settings.value("wifiPassword", "thereisnospoon").toString();
+    configurationValues.hostAddress = settings.value("hostAddress", "192.168.4.1").toString();
+    configurationValues.hostPort = settings.value("hostPort", 5001).toInt();
 
     logFilePath = QDir(logsFolderAbsolutePath).absoluteFilePath(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + ".txt");
     
@@ -34,17 +49,20 @@ LightBoxController::LightBoxController(QWidget *parent)
     }
 
     // Instantiate Pages
-    connectionPageWidget = new ConnectionPageWidget(imagesFolderAbsolutePath, this);
-    ledControlPageWidget = new LedControlPageWidget(configsFolderAbsolutePath, ledSPDsFolderAbsolutePath, this);
+    connectionPageWidget = new ConnectionPageWidget(imagesFolderAbsolutePath, configurationValues.hostAddress,
+                                                    configurationValues.hostPort, configurationValues.wifiSsid,
+                                                    configurationValues.wifiPassword, this);
+    ledControlPageWidget = new LedControlPageWidget(configsFolderAbsolutePath, presetsFolderAbsolutePath,
+                                                    configurationValues.ledSpdFolder, this);
     presetsPageWidget = new PresetsPageWidget(presetsFolderAbsolutePath, iconsFolderAbsolutePath, ledControlPageWidget->getLedControllers(), this);
-    cie1931PageWidget = new Cie1931PageWidget(imagesFolderAbsolutePath, this);
-    sunlightSimulatorPageWidget = new SunlightSimulatorPageWidget(this);
+    cie1976PageWidget = new Cie1976PageWidget(imagesFolderAbsolutePath, configurationValues.calibrationFile, this);
+    sunlightSimulatorPageWidget = new SunlightSimulatorPageWidget(configurationValues.calibrationFile, this);
 
     // Emplace inside ui->stackedWidget
     ui->stackedWidget->insertWidget(0, connectionPageWidget);
     ui->stackedWidget->insertWidget(1, ledControlPageWidget);
     ui->stackedWidget->insertWidget(2, presetsPageWidget);
-    ui->stackedWidget->insertWidget(3, cie1931PageWidget);
+    ui->stackedWidget->insertWidget(3, cie1976PageWidget);
     ui->stackedWidget->insertWidget(4, sunlightSimulatorPageWidget);
 
     // Initial setup for stacked widget
@@ -54,7 +72,7 @@ LightBoxController::LightBoxController(QWidget *parent)
     connect(connectionPageWidget, &ConnectionPageWidget::logMessage, this, &LightBoxController::logMessage);
     connect(ledControlPageWidget, &LedControlPageWidget::logMessage, this, &LightBoxController::logMessage);
     connect(presetsPageWidget, &PresetsPageWidget::logMessage, this, &LightBoxController::logMessage);
-    connect(cie1931PageWidget, &Cie1931PageWidget::logMessage, this, &LightBoxController::logMessage);
+    connect(cie1976PageWidget, &Cie1976PageWidget::logMessage, this, &LightBoxController::logMessage);
     connect(sunlightSimulatorPageWidget, &SunlightSimulatorPageWidget::logMessage, this, &LightBoxController::logMessage);
 
     // Connect Orchestration
@@ -71,15 +89,16 @@ LightBoxController::LightBoxController(QWidget *parent)
     pageSelector->addAction(ui->actionConnection);
     pageSelector->addAction(ui->actionLedControl);
     pageSelector->addAction(ui->actionPresets);
-    pageSelector->addAction(ui->actionCIE1931);
+    pageSelector->addAction(ui->actionCIE1976);
     pageSelector->addAction(ui->actionSunlightSimulator);
     
     // UI Connections
     connect(ui->actionExit, &QAction::triggered, this, &LightBoxController::actionExit);
+    connect(ui->actionConfiguration, &QAction::triggered, this, &LightBoxController::showConfigurationDialog);
     connect(ui->actionConnection, &QAction::toggled, this, &LightBoxController::changeStakedWidgetPage);
     connect(ui->actionLedControl, &QAction::toggled, this, &LightBoxController::changeStakedWidgetPage);
     connect(ui->actionPresets, &QAction::toggled, this, &LightBoxController::changeStakedWidgetPage);
-    connect(ui->actionCIE1931, &QAction::toggled, this, &LightBoxController::changeStakedWidgetPage);
+    connect(ui->actionCIE1976, &QAction::toggled, this, &LightBoxController::changeStakedWidgetPage);
     connect(ui->actionSunlightSimulator, &QAction::toggled, this, &LightBoxController::changeStakedWidgetPage);
 
     // Explicitly connect remaining Toolbar commands if handled inside Tabs
@@ -107,7 +126,7 @@ LightBoxController::LightBoxController(QWidget *parent)
     connect(ui->actionDimming, &QAction::toggled, presetsPageWidget, &PresetsPageWidget::setDimmingEnabled);
 
     // Log Actions
-    ui->actionShowLog->setChecked(true);
+    ui->actionShowLog->setChecked(false);
     connect(ui->actionShowLog, &QAction::toggled, ui->logPanel, &QTextBrowser::setVisible);
     ui->logPanel->setVisible(ui->actionShowLog->isChecked());
 
@@ -138,37 +157,66 @@ void LightBoxController::actionExit()
     QCoreApplication::quit();
 }
 
+void LightBoxController::showConfigurationDialog()
+{
+    ConfigurationDialog dialog(configurationValues, this);
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    configurationValues = dialog.values();
+    if (!QDir(configurationValues.ledSpdFolder).exists()) {
+        configurationValues.ledSpdFolder = ledSPDsFolderAbsolutePath;
+    }
+    QSettings settings("BME", "LED_GUI");
+    settings.setValue("ledSpdFolder", configurationValues.ledSpdFolder);
+    settings.setValue("calibrationFile", configurationValues.calibrationFile);
+    settings.setValue("wifiSsid", configurationValues.wifiSsid);
+    settings.setValue("wifiPassword", configurationValues.wifiPassword);
+    settings.setValue("hostAddress", configurationValues.hostAddress);
+    settings.setValue("hostPort", configurationValues.hostPort);
+
+    connectionPageWidget->setConnectionSettings(configurationValues.hostAddress,
+                                                 configurationValues.hostPort,
+                                                 configurationValues.wifiSsid,
+                                                 configurationValues.wifiPassword);
+    ledControlPageWidget->setLedSPDsFolder(configurationValues.ledSpdFolder);
+    cie1976PageWidget->setCalibrationFile(configurationValues.calibrationFile);
+    sunlightSimulatorPageWidget->setCalibrationFile(configurationValues.calibrationFile);
+    logMessage("Configuration", "Configuration updated.");
+}
+
 void LightBoxController::changeStakedWidgetPage()
 {
     if (ui->actionConnection->isChecked()) {
         ui->stackedWidget->setCurrentIndex(0);
         ui->menuLEDControl->setEnabled(false);
         ui->menuPresets->setEnabled(false);
-        ui->menuCIE1931->setEnabled(false);
+        ui->menuCIE1976->setEnabled(false);
         ui->menuSunlightSimulator->setEnabled(false);
     } else if (ui->actionLedControl->isChecked()) {
         ui->stackedWidget->setCurrentIndex(1);
         ui->menuLEDControl->setEnabled(true);
         ui->menuPresets->setEnabled(false);
-        ui->menuCIE1931->setEnabled(false);
+        ui->menuCIE1976->setEnabled(false);
         ui->menuSunlightSimulator->setEnabled(false);
     } else if (ui->actionPresets->isChecked()) {
         ui->stackedWidget->setCurrentIndex(2);
         ui->menuLEDControl->setEnabled(false);
         ui->menuPresets->setEnabled(true);
-        ui->menuCIE1931->setEnabled(false);
+        ui->menuCIE1976->setEnabled(false);
         ui->menuSunlightSimulator->setEnabled(false);
-    } else if (ui->actionCIE1931->isChecked()) {
+    } else if (ui->actionCIE1976->isChecked()) {
         ui->stackedWidget->setCurrentIndex(3);
         ui->menuLEDControl->setEnabled(false);
         ui->menuPresets->setEnabled(false);
-        ui->menuCIE1931->setEnabled(true);
+        ui->menuCIE1976->setEnabled(true);
         ui->menuSunlightSimulator->setEnabled(false);
     } else if (ui->actionSunlightSimulator->isChecked()) {
         ui->stackedWidget->setCurrentIndex(4);
         ui->menuLEDControl->setEnabled(false);
         ui->menuPresets->setEnabled(false);
-        ui->menuCIE1931->setEnabled(false);
+        ui->menuCIE1976->setEnabled(false);
         ui->menuSunlightSimulator->setEnabled(true);
     }
 }
@@ -176,7 +224,19 @@ void LightBoxController::changeStakedWidgetPage()
 void LightBoxController::logMessage(const QString& sender, const QString& message)
 {
     QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    QString logLine = timestamp + " - [" + sender + "]: " + message;
+    QString displaySender = sender;
+    if (sender == "ConnectionPage") {
+        displaySender = "Connection";
+    } else if (sender == "LedControl") {
+        displaySender = "LED Control";
+    } else if (sender == "CIE1976") {
+        displaySender = "CIE 1976";
+    } else if (sender == "SunlightSimulatorPage") {
+        displaySender = "Sunlight Simulator";
+    } else if (sender == "PresetsPage") {
+        displaySender = "Presets";
+    }
+    QString logLine = timestamp + " - [" + displaySender + "] " + message;
 
     QFile file(logFilePath);
     if(file.open(QIODevice::WriteOnly | QIODevice::Append)) {
@@ -186,4 +246,15 @@ void LightBoxController::logMessage(const QString& sender, const QString& messag
     }
     qDebug() << logLine;
     ui->logPanel->append(logLine);
+
+    const QString plainMessage = QString(message).remove(QRegularExpression("<[^>]*>"));
+    const QString warningText = plainMessage.toLower();
+    if (warningText.contains("error")
+        || warningText.contains("fail")
+        || warningText.contains("not connected")
+        || warningText.contains("select at least")
+        || warningText.contains("before saving")
+        || warningText.contains("invalid")) {
+        ui->actionShowLog->setChecked(true);
+    }
 }

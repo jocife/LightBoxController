@@ -1,5 +1,5 @@
 % build_dll.m
-% Generates the C++ DLL from optimize_led_weights.m and evaluate_metrics.m using MATLAB Coder
+% Generates the C++ DLL from the optimization and evaluation functions using MATLAB Coder
 
 % 1. Create configuration object for DLL
 cfg = coder.config('dll');
@@ -18,6 +18,9 @@ type_weights = coder.typeof(0, [1, max_leds], [false, true]);  % Variable LED-co
 
 args_opt = {type_led_spd, type_led_wls, type_illuminant};
 args_eval = {type_weights, type_led_spd, type_led_wls, type_illuminant};
+args_chromaticity = {type_led_spd, type_led_wls, type_illuminant, type_illuminant};
 
 % 3. Generate Code
-codegen optimize_led_weights.m -args args_opt evaluate_metrics.m -args args_eval -config cfg -report
+codegen optimize_led_weights.m -args args_opt ...
+    optimize_chromaticity_weights.m -args args_chromaticity ...
+    evaluate_metrics.m -args args_eval -config cfg -report

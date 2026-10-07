@@ -1,27 +1,33 @@
 #include "connectionpagewidget.h"
 #include "ui_connectionpagewidget.h"
 
-ConnectionPageWidget::ConnectionPageWidget(const QString& imagesFolderAbsolutePath, QWidget *parent)
+ConnectionPageWidget::ConnectionPageWidget(const QString& imagesFolderAbsolutePath, const QString& hostAddress,
+                                           qint16 hostPort, const QString& wifiSsid, const QString& wifiPassword,
+                                           QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ConnectionPageWidget)
     , tcpSocket(new QTcpSocket(this))
+    , hostIp(hostAddress)
+    , hostPort(hostPort)
+    , wifiSsid(wifiSsid)
+    , wifiPassword(wifiPassword)
 {
     ui->setupUi(this);
 
-    // Lightcabinet display setup
-    imageLightCabinet = new QImage(imagesFolderAbsolutePath + "/" + "light-cabinet.jpg");
-    labelDisplayLightCabinet = new QLabel("");
-    labelDisplayLightCabinet->setPixmap(QPixmap::fromImage(*imageLightCabinet));
-    // labelDisplayLightCabinet->adjustSize(); // Wait for layout
+    // Lightbox display setup
+    imageLightBox = new QImage(imagesFolderAbsolutePath + "/" + "lightbox.jpg");
+    labelDisplayLightBox = new QLabel("");
+    labelDisplayLightBox->setPixmap(QPixmap::fromImage(*imageLightBox));
+    // labelDisplayLightBox->adjustSize(); // Wait for layout
 
-    ui->gridLayoutPageConnection->addWidget(labelDisplayLightCabinet, 0, 0, -1, 1, Qt::AlignHCenter);
+    ui->gridLayoutPageConnection->addWidget(labelDisplayLightBox, 0, 0, -1, 1, Qt::AlignHCenter);
 
     // WIFI texts
-    labelWifiSSID = new QLabel("SSID: " + WIFI_SSID);
+    labelWifiSSID = new QLabel("SSID: " + wifiSsid);
     labelWifiSSID->setStyleSheet("font: 18pt;");
     labelWifiSSID->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
-    labelWifiPassword = new QLabel("Password: " + WIFI_PASSWORD);
+    labelWifiPassword = new QLabel("Password: " + wifiPassword);
     labelWifiPassword->setStyleSheet("font: 18pt;");
     labelWifiPassword->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
@@ -66,7 +72,7 @@ ConnectionPageWidget::~ConnectionPageWidget()
         tcpSocket->disconnect();
         tcpSocket->abort();
     }
-    delete imageLightCabinet;
+    delete imageLightBox;
     delete ui;
 }
 
@@ -75,21 +81,32 @@ void ConnectionPageWidget::sendData(const QByteArray& data)
     if (tcpSocket && tcpSocket->state() == QAbstractSocket::ConnectedState) {
         tcpSocket->write(data.constData());
         tcpSocket->flush(); // Force the packet to be sent immediately
-        emit logMessage("ConnectionPage", "Sent " + QString::number(data.size()) + " bytes: " + QString(data));
+        emit logMessage("Connection", "Sent " + QString::number(data.size()) + " bytes: " + QString(data));
     } else {
-        emit logMessage("ConnectionPage", "Failed to send: Not connected.");
+        emit logMessage("Connection", "Failed to send: Not connected.");
     }
+}
+
+void ConnectionPageWidget::setConnectionSettings(const QString& hostAddress, qint16 port,
+                                                  const QString& ssid, const QString& password)
+{
+    hostIp = hostAddress;
+    hostPort = port;
+    wifiSsid = ssid;
+    wifiPassword = password;
+    labelWifiSSID->setText("SSID: " + wifiSsid);
+    labelWifiPassword->setText("Password: " + wifiPassword);
 }
 
 void ConnectionPageWidget::pushButtonConnectIsClicked()
 {
-    emit logMessage("ConnectionPage", "Connecting to " + HostIP + ":" + QString::number(HostPORT) + "...");
-    tcpSocket->connectToHost(HostIP, HostPORT);
+    emit logMessage("Connection", "Connecting to " + hostIp + ":" + QString::number(hostPort) + "...");
+    tcpSocket->connectToHost(hostIp, hostPort);
 }
 
 void ConnectionPageWidget::pushButtonDisconnectIsClicked()
 {
-    emit logMessage("ConnectionPage", "Disconnecting...");
+    emit logMessage("Connection", "Disconnecting...");
     tcpSocket->disconnectFromHost();
 }
 
@@ -100,7 +117,7 @@ void ConnectionPageWidget::tcpSocketStateHasChanged(QAbstractSocket::SocketState
             labelTcpSocketStateSymbol->setText("⬤");
             labelTcpSocketStateSymbol->setStyleSheet("font: 18pt; color: red;");
             labelTcpSocketState->setText("Disconnected");
-            emit logMessage("ConnectionPage", "TCP Socket: Disconnected");
+            emit logMessage("Connection", "TCP Socket: Disconnected");
             emit connectionStateChanged(false);
             break;
         case QAbstractSocket::HostLookupState:
@@ -110,13 +127,13 @@ void ConnectionPageWidget::tcpSocketStateHasChanged(QAbstractSocket::SocketState
             labelTcpSocketStateSymbol->setText("⬤");
             labelTcpSocketStateSymbol->setStyleSheet("font: 18pt; color: orange;");
             labelTcpSocketState->setText("Connecting");
-            emit logMessage("ConnectionPage", "TCP Socket: Connecting");
+            emit logMessage("Connection", "TCP Socket: Connecting");
             break;
         case QAbstractSocket::ConnectedState:
             labelTcpSocketStateSymbol->setText("⬤");
             labelTcpSocketStateSymbol->setStyleSheet("font: 18pt; color: green;");
             labelTcpSocketState->setText("Connected");
-            emit logMessage("ConnectionPage", "TCP Socket: Connected");
+            emit logMessage("Connection", "TCP Socket: Connected");
             emit connectionStateChanged(true);
             break;
         case QAbstractSocket::BoundState:

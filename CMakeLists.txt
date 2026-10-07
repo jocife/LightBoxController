@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-set(LightBoxController_VERSION "1.0.0" CACHE STRING "LightBox Controller release version")
+set(LightBoxController_VERSION "1.1.1")
 project(LightBoxController VERSION ${LightBoxController_VERSION} LANGUAGES CXX)
 
 # --- Output Directorys ---

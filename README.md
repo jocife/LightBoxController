@@ -376,6 +376,10 @@ Builds the C++ Qt project and runs the resulting executable:
   ```powershell
   .\scripts\update_qt.ps1 -Configuration Release
   ```
+- `-SkipConfigure`: Skip cleaning output directories and skip reconfiguring CMake (useful for quick incremental rebuilds)
+  ```powershell
+  .\scripts\update_qt.ps1 -SkipConfigure
+  ```
 - `-NoRun`: Build only, without running the application
   ```powershell
   .\scripts\update_qt.ps1 -NoRun

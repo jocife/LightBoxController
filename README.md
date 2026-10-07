@@ -399,28 +399,32 @@ Rebuilds the Release executable from source and packages it for distribution:
   .\scripts\build_release_exe.ps1 -SkipInstaller
   ```
 
-##### publish_release.ps1 — GitHub Release Automation
+##### `publish_release.ps1` — GitHub Release Automation
 Automatically builds the application, generates the Windows installer, and uploads it to GitHub as a new release. Requires the [GitHub CLI](#5-publishing-tools) to be authenticated.
 
-`powershell
-git tag v1.2.0
-.\scripts\publish_release.ps1
-`
+**Best Practice Workflow:**
+1. Commit your final changes and push to GitHub: `git push`
+2. Create your new release tag locally: `git tag v1.2.0`
+3. Push your tag to GitHub: `git push --tags`
+4. Run the publish script:
+   ```powershell
+   .\scripts\publish_release.ps1
+   ```
 
 **What it does:**
-1. Automatically reads the latest Git tag (e.g., 1.2.0) to determine the version.
+1. Automatically reads the latest Git tag (e.g., `v1.2.0`) to determine the version.
 2. Ensures the release executable and NSIS installer are freshly built.
-3. Invokes the GitHub CLI to publish the release with auto-generated notes and attaches the generated installer .exe.
+3. Invokes the GitHub CLI to publish the release with auto-generated notes and attaches the generated installer `.exe`.
 
 **Optional parameters:**
-- -SkipBuild: Skips the build process and only attempts to publish the existing installer.
-  `powershell
+- `-SkipBuild`: Skips the build process and only attempts to publish the existing installer.
+  ```powershell
   .\scripts\publish_release.ps1 -SkipBuild
-  `
-- -Tag: Manually override the tag instead of letting the script auto-detect the latest one.
-  `powershell
+  ```
+- `-Tag`: Manually override the tag instead of letting the script auto-detect the latest one.
+  ```powershell
   .\scripts\publish_release.ps1 -Tag v1.2.0
-  `
+  ```
 
 **Example workflows:**
 

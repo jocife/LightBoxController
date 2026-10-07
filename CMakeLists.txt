@@ -200,7 +200,7 @@ if(WIN32)
     set(CPACK_GENERATOR "NSIS")
     set(CPACK_PACKAGE_NAME "LightBoxController")
     set(CPACK_PACKAGE_VENDOR "BME MOGI")
-    set(CPACK_PACKAGE_VERSION "${GIT_TAG}")
+    set(CPACK_PACKAGE_VERSION "${NUMERIC_VERSION}")
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
     
     # NSIS specific settings for installation path and UI names

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
-set(LED_GUI_VERSION "1.0.0" CACHE STRING "LED GUI release version")
-project(LED_GUI VERSION ${LED_GUI_VERSION} LANGUAGES CXX)
+set(LightBoxController_VERSION "1.0.0" CACHE STRING "LightBox Controller release version")
+project(LightBoxController VERSION ${LightBoxController_VERSION} LANGUAGES CXX)
 
 # --- Output Directorys ---
 # Forces all compiled binaries (exe) to separated output directories (Debug, Release)
@@ -179,20 +179,20 @@ endif()
 # --- CPack Configuration for NSIS Installer (Must be at the EOF) ---
 if(WIN32)
     set(CPACK_GENERATOR "NSIS")
-    set(CPACK_PACKAGE_NAME "LED_GUI")
+    set(CPACK_PACKAGE_NAME "LightBoxController")
     set(CPACK_PACKAGE_VENDOR "Your Company Name")
     set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
     
     # NSIS specific settings for installation path and UI names
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "LED_GUI")
-    set(CPACK_NSIS_DISPLAY_NAME "LED GUI Application")
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "LightBoxController")
+    set(CPACK_NSIS_DISPLAY_NAME "LightBox Controller Application")
     
     # Create Start Menu shortcut: "Executable name (without .exe)" "Shortcut name"
-    set(CPACK_PACKAGE_EXECUTABLES "LED_GUI" "LED GUI")
+    set(CPACK_PACKAGE_EXECUTABLES "LightBoxController" "LightBox Controller")
     
     # Create Desktop shortcut
     set(CPACK_NSIS_CREATE_ICONS_EXTRA 
-        "CreateShortCut '$DESKTOP\\\\LED GUI.lnk' '$INSTDIR\\\\LED_GUI.exe'"
+        "CreateShortCut '$DESKTOP\\\\LightBox Controller.lnk' '$INSTDIR\\\\LightBoxController.exe'"
     )
     
     include(CPack)

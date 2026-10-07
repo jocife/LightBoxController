@@ -6,7 +6,7 @@ param (
 Write-Host "Running MATLAB file copy script..." -ForegroundColor Cyan
 Write-Host ""
 
-# Run this script from the root directory of the led-gui project
+# Run this script from the root directory of the LightBoxController project
 $ProjectRootDir = (Get-Location).Path
 $MatlabCodegenDir = Join-Path $ProjectRootDir "matlab\codegen\dll\optimize_led_weights"
 

@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Build and run the Qt LED GUI application.
+    Build and run the Qt LightBox Controller application.
 
 .DESCRIPTION
     This script builds the C++ Qt project and runs the resulting executable.
@@ -36,7 +36,7 @@ Write-Host "Running Qt build & run script..." -ForegroundColor Cyan
 Write-Host ""
 
 $projectRoot = (Get-Location).Path
-$exePath = Join-Path $projectRoot "bin\$Configuration\LED_GUI.exe"
+$exePath = Join-Path $projectRoot "bin\$Configuration\LightBoxController.exe"
 $buildDir = Join-Path $projectRoot "build"
 
 # Initialize Visual Studio environment if not already set

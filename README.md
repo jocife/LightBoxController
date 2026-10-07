@@ -1,47 +1,71 @@
-# LED GUI
+# LightBox Controller
+
+![LightBox](resources/images/lightbox.jpg)
 
 ## Table of Contents
-- [LED GUI](#led-gui)
+- [LightBox Controller](#lightbox-controller)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
     - [What is Qt?](#what-is-qt)
-  - [Prerequisites](#prerequisites)
-    - [1. C++ Compiler \& Qt Framework](#1-c-compiler--qt-framework)
-    - [2. Build \& Packaging Tools](#2-build--packaging-tools)
-    - [3. MATLAB Environment](#3-matlab-environment)
-    - [4. Development \& Debugging](#4-development--debugging)
+  - [Setup Guide](#setup-guide)
+    - [User Guide](#user-guide)
+      - [Installing the Application](#installing-the-application)
+      - [Using the Application](#using-the-application)
+      - [Uninstalling the Application](#uninstalling-the-application)
+    - [Developer Guide](#developer-guide)
+      - [Prerequisites](#prerequisites)
+      - [Getting Started](#getting-started)
+      - [How to use MATLAB Coder](#how-to-use-matlab-coder)
+      - [Quick Build & Run Scripts](#quick-build--run-scripts)
   - [Project Structure](#project-structure)
     - [Key Directories in Detail:](#key-directories-in-detail)
   - [Themes](#themes)
-  - [Attributions \& Assets](#attributions--assets)
-  - [Getting Started](#getting-started)
-  - [How to use MATLAB Coder](#how-to-use-matlab-coder)
-    - [Automated Build (Recommended)](#automated-build-recommended)
-    - [Manual Build (Alternative)](#manual-build-alternative)
-  - [Quick Build \& Run Scripts](#quick-build--run-scripts)
-    - [`update_project.ps1` — Complete Project Update (Recommended)](#update_projectps1--complete-project-update-recommended)
-    - [`update_matlab.ps1` — MATLAB Build Only](#update_matlabps1--matlab-build-only)
-    - [`build_release_exe.ps1` — Release Rebuild \& Packaging](#build_release_exeps1--release-rebuild--packaging)
-    - [`update_qt.ps1` — Qt Build \& Run Only](#update_qtps1--qt-build--run-only)
-  - [Uninstalling the Application](#uninstalling-the-application)
+  - [Attributions & Assets](#attributions--assets)
   - [License](#license)
 
 ## Overview
 
-This application is used to control a specific light box and is built with C++ using the Qt framework.
+This application is used to control a specific lightbox and is built with C++ using the Qt framework.
 
 ### What is Qt?
 
 > Qt (/ˈkjuːt/ pronounced "cute") is a cross-platform application development framework for creating graphical user interfaces as well as cross-platform applications that run on various software and hardware platforms such as Linux, Windows, macOS, Android or embedded systems with little or no change in the underlying codebase while still being a native application with native capabilities and speed. [[Wikipedia](https://en.wikipedia.org/wiki/Qt_(software))]
 
+---
+
+## Setup Guide
+
+### User Guide
+
+#### Installing the Application
+If you have a pre-built Windows installer (.exe), simply run it and follow the on-screen prompts. Otherwise, refer to the [Developer Guide](#developer-guide) to build the application from source and generate an installer.
+
+#### Using the Application
+Once the application is installed and running, you can interact with the lightbox using the main functional tabs:
+1. **Connection**: Connect to the lightbox hardware over a TCP connection.
+2. **LED Control**: Manually adjust individual LED channel weights and master brightness.
+3. **Presets**: Save your custom lighting configurations and load them later.
+4. **CIE 1976**: Visualize chromaticity coordinates and optimize lighting parameters for specific target colors.
+5. **Sunlight Simulator**: Simulate natural sunlight conditions and customize daylight-specific lighting parameters.
+
+#### Uninstalling the Application
+If you installed the application with the Windows installer, you can uninstall it at any time:
+
+1. Open **Control Panel** &rarr; **All Control Panel Items** &rarr; **Programs and Features**.
+2. Search for **LightBox Controller Application**.
+3. Select the program and click **Uninstall**.
+4. Follow the on-screen instructions provided by the NSIS uninstaller to complete the removal.
+
+> The uninstaller will guide you through the standard Windows removal process and remove the installed application files from your system.
 
 ---
 
-## Prerequisites
+### Developer Guide
 
+#### Prerequisites
 Ensure you have the following software and tools installed before building the project. Where applicable, you can use [WinGet](https://github.com/microsoft/winget-cli) for quick installation via a terminal.
 
-### 1. C++ Compiler & Qt Framework
+##### 1. C++ Compiler & Qt Framework
 
 - **[Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/)** (C/C++ Compiler for Windows)
   ```powershell
@@ -52,7 +76,7 @@ Ensure you have the following software and tools installed before building the p
 - **[Qt](https://www.qt.io/development/download-qt-installer-oss)** (Graphical User Interface Framework)
   > **Configuration:** Open *Qt Maintenance Tool* &rarr; Add or remove components &rarr; select **Qt \<version\>** &rarr; check **MSVC 2022 64-bit** &rarr; Install.
 
-### 2. Build & Packaging Tools
+##### 2. Build & Packaging Tools
 - **[CMake](https://cmake.org/download/)**
   ```powershell
   winget install -e --id=Kitware.CMake
@@ -66,11 +90,11 @@ Ensure you have the following software and tools installed before building the p
   winget install -e --id=NSIS.NSIS
   ```
 
-### 3. MATLAB Environment
+##### 3. MATLAB Environment
 - **[MATLAB](https://www.mathworks.com/products/matlab.html)** (Required for regenerating the C++ optimization algorithm logic)
   > **Required Add-Ons:** Ensure both **MATLAB Coder** and the **Optimization Toolbox** are installed in your MATLAB environment before attempting to generate the layout files.
 
-### 4. Development & Debugging
+##### 4. Development & Debugging
 - **[Visual Studio Code](https://code.visualstudio.com/Download/)** (Recommended Code Editor)
   ```powershell
   winget install -e --id=Microsoft.VisualStudioCode
@@ -88,64 +112,10 @@ Ensure you have the following software and tools installed before building the p
 
 ---
 
-## Project Structure
-
-This repository is intuitively organized to separate the Qt frontend, the CMake build system, and the MATLAB optimization logic. Here is an overview of the core components:
-
-```text
-led-gui/
-├── .vscode/          # VS Code tasks, launch configurations, and IntelliSense settings
-├── bin/              # Compiled `.exe` binaries and required runtime assets (Debug/Release)
-├── build/            # CMake build artifacts, caches, and temporary compilation files
-├── include/          # External C++ headers (populated by the MATLAB Coder generation)
-├── lib/              # Compiled dependencies, `.lib` static libraries, and `.dll` files
-├── matlab/           # MATLAB source scripts outlining the core lighting algorithms
-├── resources/        # Application assets (hardware configs, user presets, UI icons, stylesheets)
-├── scripts/          # Automation scripts (e.g., PowerShell utilities for DLL management)
-└── src/              # C++ source code for the Qt graphical user interface
-    ├── app/          # Main application window and orchestrator logic
-    ├── components/   # Reusable UI widgets shared across multiple pages
-    ├── optimization/ # Core C++ wrapper logic for interacting with external algorithms
-    ├── pages/        # The main application tabs (Connection, LED Control, Presets, CIE 1976)
-    └── main.cpp      # Application entry point
-```
-
-### Key Directories in Detail:
-- **`matlab/`**: Contains the mathematical models and constraints for the LED light box. You must process these files with MATLAB Coder to generate the underlying C++ backend before building the UI.
-- **`src/`**: Houses all Qt-related code. It is cleanly modularized into `app` (the main window frame), `pages` (the individual functional tabs), and `components` (small, standalone widgets).
-- **`resources/`**: Includes necessary runtime data like CSV calibration files (`configs/`), saved parameters (`presets/`), and visual elements (`icons/`, `themes/`).
-
----
-
-## Themes
-
-The Qt Style Sheet (QSS) themes included in `resources/themes/` are provided by
-[DevSec Studio](https://qss-stock.devsecstudio.com/). The original source and
-downloadable theme collection are available in the
-[QSS Stock gallery](https://qss-stock.devsecstudio.com/templates.php).
-
-The Diffnes theme used by this project is available here:
-
-- [Included `Diffnes.qss` file](resources/themes/Diffnes.qss)
-- [Download the original Diffnes theme](https://qss-stock.devsecstudio.com/templates/components/components3/diffnes/Diffnes.rar)
-
-The theme files retain their original copyright notice and MIT License.
-
----
-
-## Attributions & Assets
-
-- **CIE 1976 UCS Chromaticity Diagram** (`resources/images/cie1976-chromaticity-diagram.jpg`):
-  - Source: [HyperPhysics — CIE 1976 Color Space](http://hyperphysics.phy-astr.gsu.edu/hbase/vision/cie1976.html)
-  - Hosted by: Department of Physics and Astronomy, Georgia State University (C. R. Nave).
-
----
-
-## Getting Started
-
+#### Getting Started
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/jocife/led-gui.git
+   git clone https://github.com/jocife/LightBoxController.git
    ```
 
 2. **Configure your local Qt environment paths:**
@@ -203,26 +173,25 @@ The theme files retain their original copyright notice and MIT License.
    cpack -C Release -G NSIS
    ```
 
-   *The generated installer will be located at:* `build/LED_GUI-<VERSION>-win64.exe`
+   *The generated installer will be located at:* `build/LightBoxController-<VERSION>-win64.exe`
 
 6. **Launch the application:**
    Execute the compiled binary directly from the terminal.
    ```powershell
-   cmd /c start .\bin\Release\LED_GUI.exe
+   cmd /c start .\bin\Release\LightBoxController.exe
    ```
 
    - *Optional:* To launch the Debug version, run:
      ```powershell
-     cmd /c start .\bin\Debug\LED_GUI.exe
+     cmd /c start .\bin\Debug\LightBoxController.exe
      ```
 
 ---
 
-## How to use MATLAB Coder
-
+#### How to use MATLAB Coder
 All MATLAB-related source files are located in the `matlab/` directory. Before building the Qt application, you must use MATLAB Coder to generate the required C++ headers and DLLs.
 
-### Automated Build (Recommended)
+##### Automated Build (Recommended)
 
 The easiest way to build the MATLAB DLL is to use the automated PowerShell script:
 
@@ -246,7 +215,7 @@ After the build completes, run the separate copy script:
 .\scripts\copy_matlab_files.ps1
 ```
 
-### Manual Build (Alternative)
+##### Manual Build (Alternative)
 
 If you prefer to run each step manually, follow the steps below.
 
@@ -314,11 +283,10 @@ If you prefer to run each step manually, follow the steps below.
 
 ---
 
-## Quick Build & Run Scripts
-
+#### Quick Build & Run Scripts
 For a streamlined development workflow, helper PowerShell scripts are provided in the `scripts/` directory:
 
-### `update_project.ps1` — Complete Project Update (Recommended)
+##### `update_project.ps1` — Complete Project Update (Recommended)
 Runs the entire project update workflow in a single command:
 
 ```powershell
@@ -348,7 +316,7 @@ Runs the entire project update workflow in a single command:
   .\scripts\update_project.ps1 -MatlabRootDir "D:/MathWorks/MATLAB/R2024a"
   ```
 
-### `update_matlab.ps1` — MATLAB Build Only
+##### `update_matlab.ps1` — MATLAB Build Only
 Orchestrates the full MATLAB DLL generation and deployment process:
 
 ```powershell
@@ -370,25 +338,7 @@ Orchestrates the full MATLAB DLL generation and deployment process:
   .\scripts\update_matlab.ps1 -MatlabRootDir "D:/MathWorks/MATLAB/R2024a"
   ```
 
-### `build_release_exe.ps1` — Release Rebuild & Packaging
-Rebuilds the Release executable from source and packages it for distribution:
-
-```powershell
-.\scripts\build_release_exe.ps1
-```
-
-**What it does:**
-1. Removes any stale `bin/Release` output before building
-2. Reconfigures and rebuilds the C++ Qt project from source
-3. Creates the NSIS installer by default
-
-**Optional parameters:**
-- `-SkipInstaller`: Build the Release executable without generating the installer
-  ```powershell
-  .\scripts\build_release_exe.ps1 -SkipInstaller
-  ```
-
-### `update_qt.ps1` — Qt Build & Run Only
+##### `update_qt.ps1` — Qt Build & Run Only
 Builds the C++ Qt project and runs the resulting executable:
 
 ```powershell
@@ -407,6 +357,24 @@ Builds the C++ Qt project and runs the resulting executable:
 - `-NoRun`: Build only, without running the application
   ```powershell
   .\scripts\update_qt.ps1 -NoRun
+  ```
+
+##### `build_release_exe.ps1` — Release Rebuild & Packaging
+Rebuilds the Release executable from source and packages it for distribution:
+
+```powershell
+.\scripts\build_release_exe.ps1
+```
+
+**What it does:**
+1. Removes any stale `bin/Release` output before building
+2. Reconfigures and rebuilds the C++ Qt project from source
+3. Creates the NSIS installer by default
+
+**Optional parameters:**
+- `-SkipInstaller`: Build the Release executable without generating the installer
+  ```powershell
+  .\scripts\build_release_exe.ps1 -SkipInstaller
   ```
 
 **Example workflows:**
@@ -428,16 +396,56 @@ Builds the C++ Qt project and runs the resulting executable:
 
 ---
 
-## Uninstalling the Application
+## Project Structure
 
-If you installed the application with the Windows installer, you can uninstall it at any time:
+This repository is intuitively organized to separate the Qt frontend, the CMake build system, and the MATLAB optimization logic. Here is an overview of the core components:
 
-1. Open **Control Panel** &rarr; **All Control Panel Items** &rarr; **Programs and Features**.
-2. Search for **LED GUI Application**.
-3. Select the program and click **Uninstall**.
-4. Follow the on-screen instructions provided by the NSIS uninstaller to complete the removal.
+```text
+LightBoxController/
+├── .vscode/          # VS Code tasks, launch configurations, and IntelliSense settings
+├── bin/              # Compiled `.exe` binaries and required runtime assets (Debug/Release)
+├── build/            # CMake build artifacts, caches, and temporary compilation files
+├── include/          # External C++ headers (populated by the MATLAB Coder generation)
+├── lib/              # Compiled dependencies, `.lib` static libraries, and `.dll` files
+├── matlab/           # MATLAB source scripts outlining the core lighting algorithms
+├── resources/        # Application assets (hardware configs, user presets, UI icons, stylesheets)
+├── scripts/          # Automation scripts (e.g., PowerShell utilities for DLL management)
+└── src/              # C++ source code for the Qt graphical user interface
+    ├── app/          # Main application window and orchestrator logic
+    ├── components/   # Reusable UI widgets shared across multiple pages
+    ├── optimization/ # Core C++ wrapper logic for interacting with external algorithms
+    ├── pages/        # The main application tabs (Connection, LED Control, Presets, CIE 1976)
+    └── main.cpp      # Application entry point
+```
 
-> The uninstaller will guide you through the standard Windows removal process and remove the installed application files from your system.
+### Key Directories in Detail:
+- **`matlab/`**: Contains the mathematical models and constraints for the LED light box. You must process these files with MATLAB Coder to generate the underlying C++ backend before building the UI.
+- **`src/`**: Houses all Qt-related code. It is cleanly modularized into `app` (the main window frame), `pages` (the individual functional tabs), and `components` (small, standalone widgets).
+- **`resources/`**: Includes necessary runtime data like CSV calibration files (`configs/`), saved parameters (`presets/`), and visual elements (`icons/`, `themes/`).
+
+---
+
+## Themes
+
+The Qt Style Sheet (QSS) themes included in `resources/themes/` are provided by
+[DevSec Studio](https://qss-stock.devsecstudio.com/). The original source and
+downloadable theme collection are available in the
+[QSS Stock gallery](https://qss-stock.devsecstudio.com/templates.php).
+
+The Diffnes theme used by this project is available here:
+
+- [Included `Diffnes.qss` file](resources/themes/Diffnes.qss)
+- [Download the original Diffnes theme](https://qss-stock.devsecstudio.com/templates/components/components3/diffnes/Diffnes.rar)
+
+The theme files retain their original copyright notice and MIT License.
+
+---
+
+## Attributions & Assets
+
+- **CIE 1976 UCS Chromaticity Diagram** (`resources/images/cie1976-chromaticity-diagram.jpg`):
+  - Source: [HyperPhysics — CIE 1976 Color Space](http://hyperphysics.phy-astr.gsu.edu/hbase/vision/cie1976.html)
+  - Hosted by: Department of Physics and Astronomy, Georgia State University (C. R. Nave).
 
 ---
 

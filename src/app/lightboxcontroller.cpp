@@ -25,7 +25,7 @@ LightBoxController::LightBoxController(QWidget *parent)
     logsFolderAbsolutePath = QDir(executableAbsolutePath).absoluteFilePath("logs");
     presetsFolderAbsolutePath = QDir(executableAbsolutePath).absoluteFilePath("presets");
 
-    QSettings settings("BME", "LED_GUI");
+    QSettings settings("BME", "LightBoxController");
     configurationValues.ledSpdFolder = settings.value("ledSpdFolder", ledSPDsFolderAbsolutePath).toString();
     if (!QDir(configurationValues.ledSpdFolder).exists()) {
         configurationValues.ledSpdFolder = ledSPDsFolderAbsolutePath;
@@ -168,7 +168,7 @@ void LightBoxController::showConfigurationDialog()
     if (!QDir(configurationValues.ledSpdFolder).exists()) {
         configurationValues.ledSpdFolder = ledSPDsFolderAbsolutePath;
     }
-    QSettings settings("BME", "LED_GUI");
+    QSettings settings("BME", "LightBoxController");
     settings.setValue("ledSpdFolder", configurationValues.ledSpdFolder);
     settings.setValue("calibrationFile", configurationValues.calibrationFile);
     settings.setValue("wifiSsid", configurationValues.wifiSsid);

@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Builds the LED GUI Release executable from source.
+    Builds the LightBox Controller Release executable from source.
 
 .DESCRIPTION
     Configures and builds the Qt/CMake project, then deletes any stale Release output
@@ -34,14 +34,14 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-Write-Host "===== LED GUI Release Build =====" -ForegroundColor Cyan
+Write-Host "===== LightBox Controller Release Build =====" -ForegroundColor Cyan
 Write-Host "Configuration: $Configuration" -ForegroundColor Yellow
 Write-Host ""
 
 $projectRoot = (Get-Location).Path
 $buildDir = Join-Path $projectRoot "build"
 $releaseOutputDir = Join-Path $projectRoot "bin\$Configuration"
-$exePath = Join-Path $releaseOutputDir "LED_GUI.exe"
+$exePath = Join-Path $releaseOutputDir "LightBoxController.exe"
 
 # Initialize Visual Studio build environment if needed.
 if (-not $env:VCINSTALLDIR) {
@@ -85,7 +85,7 @@ if (-not $SkipConfigure) {
 }
 
 Write-Host "[3/3] Building application ($Configuration) ..." -ForegroundColor Yellow
-cmake --build $buildDir --config $Configuration --target LED_GUI
+cmake --build $buildDir --config $Configuration --target LightBoxController
 if ($LASTEXITCODE -ne 0) {
     throw "Build failed."
 }

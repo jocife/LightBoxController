@@ -22,8 +22,6 @@
     - [`update_project.ps1` — Complete Project Update (Recommended)](#update_projectps1--complete-project-update-recommended)
     - [`update_matlab.ps1` — MATLAB Build Only](#update_matlabps1--matlab-build-only)
     - [`build_release_exe.ps1` — Release Rebuild \& Packaging](#build_release_exeps1--release-rebuild--packaging)
-    - [`publish_release.ps1` — Build \& Publish Forgejo Release](#publish_releaseps1--build--publish-forgejo-release)
-      - [Environment variable setup](#environment-variable-setup)
     - [`update_qt.ps1` — Qt Build \& Run Only](#update_qtps1--qt-build--run-only)
   - [Uninstalling the Application](#uninstalling-the-application)
   - [License](#license)
@@ -318,7 +316,7 @@ If you prefer to run each step manually, follow the steps below.
 
 ## Quick Build & Run Scripts
 
-For a streamlined development workflow, three helper PowerShell scripts are provided in the `scripts/` directory:
+For a streamlined development workflow, helper PowerShell scripts are provided in the `scripts/` directory:
 
 ### `update_project.ps1` — Complete Project Update (Recommended)
 Runs the entire project update workflow in a single command:
@@ -389,48 +387,6 @@ Rebuilds the Release executable from source and packages it for distribution:
   ```powershell
   .\scripts\build_release_exe.ps1 -SkipInstaller
   ```
-
-### `publish_release.ps1` — Build & Publish Forgejo Release
-Builds a versioned Windows installer locally and publishes it as a Forgejo release asset:
-
-```powershell
-.\scripts\publish_release.ps1 -Version 1.0.1 -ReleaseNotes "Bug fixes and improvements"
-```
-
-The script:
-1. Verifies that the working tree is clean
-2. Configures CMake and builds the versioned NSIS installer
-3. Creates and pushes the corresponding Git tag (for example, `v1.0.1`)
-4. Calculates the installer SHA-256 checksum
-5. Creates the Forgejo release and uploads the installer
-
-The Forgejo API token is loaded from the `FORGEJO_API_TOKEN` environment variable and is not stored in the repository. The token must have `write:repository` permission.
-
-#### Environment variable setup
-
-Set the token for the current PowerShell session:
-
-```powershell
-$env:FORGEJO_API_TOKEN = "your-forgejo-api-token"
-```
-
-To persist it for your Windows user, set it outside the repository and open a new terminal afterward:
-
-```powershell
-[Environment]::SetEnvironmentVariable("FORGEJO_API_TOKEN", "your-forgejo-api-token", "User")
-```
-
-Publishing reads the token without prompting:
-
-```powershell
-.\scripts\publish_release.ps1 -Version 1.0.1
-```
-
-Use `-Draft` or `-Prerelease` when appropriate. To publish an already-built installer without rebuilding:
-
-```powershell
-.\scripts\publish_release.ps1 -Version 1.0.1 -SkipBuild
-```
 
 ### `update_qt.ps1` — Qt Build & Run Only
 Builds the C++ Qt project and runs the resulting executable:

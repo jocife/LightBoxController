@@ -206,6 +206,7 @@ if(WIN32)
     # NSIS specific settings for installation path and UI names
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "LightBoxController")
     set(CPACK_NSIS_DISPLAY_NAME "LightBox Controller Application")
+    set(CPACK_NSIS_INSTALLED_ICON_NAME "LightBoxController.exe")
     
     # Create Start Menu shortcut: "Executable name (without .exe)" "Shortcut name"
     set(CPACK_PACKAGE_EXECUTABLES "LightBoxController" "LightBox Controller")

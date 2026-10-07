@@ -402,7 +402,7 @@ Rebuilds the Release executable from source and packages it for distribution:
 ##### `publish_release.ps1` — GitHub Release Automation
 Automatically builds the application, generates the Windows installer, and uploads it to GitHub as a new release. Requires the [GitHub CLI](#5-publishing-tools) to be authenticated.
 
-**Best Practice Workflow:**
+**Recommended Release Workflow:**
 1. Commit your final changes: `git commit -m "your message"`
 2. Push your commits to GitHub: `git push`
 3. Create your new release tag locally: `git tag v1.2.0`

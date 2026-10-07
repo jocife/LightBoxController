@@ -210,9 +210,9 @@ if(WIN32)
     # Create Start Menu shortcut: "Executable name (without .exe)" "Shortcut name"
     set(CPACK_PACKAGE_EXECUTABLES "LightBoxController" "LightBox Controller")
     
-    # Create Desktop shortcut
+    # Force explicit icons for Start Menu and Desktop shortcuts to prevent Windows cache issues
     set(CPACK_NSIS_CREATE_ICONS_EXTRA 
-        "CreateShortCut '$DESKTOP\\\\LightBox Controller.lnk' '$INSTDIR\\\\LightBoxController.exe'"
+        "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\LightBox Controller.lnk' '$INSTDIR\\\\LightBoxController.exe' '' '$INSTDIR\\\\LightBoxController.exe' 0\n  CreateShortCut '$DESKTOP\\\\LightBox Controller.lnk' '$INSTDIR\\\\LightBoxController.exe' '' '$INSTDIR\\\\LightBoxController.exe' 0"
     )
     
     include(CPack)

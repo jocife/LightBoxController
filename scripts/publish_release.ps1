@@ -29,7 +29,7 @@ if (-not (Get-Command "gh" -ErrorAction SilentlyContinue)) {
 # 2. Extract version from CMakeLists.txt to find the installer
 $cmakeFile = Join-Path $projectRoot "CMakeLists.txt"
 $version = "1.0.0" # Default fallback
-$cmakeContent = Get-Content $cmakeFile
+$cmakeContent = Get-Content $cmakeFile -Raw
 if ($cmakeContent -match 'set\(LightBoxController_VERSION\s+"([^"]+)"') {
     $version = $matches[1]
 }

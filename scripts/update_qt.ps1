@@ -29,6 +29,7 @@
 param(
     [ValidateSet("Debug", "Release")]
     [string]$Configuration = "Debug",
+    [switch]$SkipConfigure,
     [switch]$NoRun
 )
 
@@ -57,9 +58,34 @@ if (-not $env:VCINSTALLDIR) {
     Write-Host ""
 }
 
+$outputDir = Join-Path $projectRoot "bin\$Configuration"
+
+Write-Host "Cleaning output directories..." -ForegroundColor Yellow
+if (Test-Path $outputDir) {
+    Remove-Item $outputDir -Recurse -Force
+}
+if (-not $SkipConfigure) {
+    if (Test-Path $buildDir) {
+        Remove-Item $buildDir -Recurse -Force
+    }
+}
+
+if (-not $SkipConfigure) {
+    Write-Host "Configuring CMake project..." -ForegroundColor Yellow
+    cmake -S $projectRoot -B $buildDir
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[-] CMake configuration failed." -ForegroundColor Red
+        exit 1
+    }
+}
+
 # Build the project
 Write-Host "[Step 1/2] Building C++ project ($Configuration)..." -ForegroundColor Yellow
 cmake --build $buildDir --config $Configuration
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "[-] Build failed." -ForegroundColor Red
+    exit 1
+}
 
 Write-Host ""
 

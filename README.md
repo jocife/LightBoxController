@@ -399,23 +399,28 @@ Rebuilds the Release executable from source and packages it for distribution:
   .\scripts\build_release_exe.ps1 -SkipInstaller
   ```
 
-##### `publish_release.ps1` — GitHub Release Automation
+##### publish_release.ps1 — GitHub Release Automation
 Automatically builds the application, generates the Windows installer, and uploads it to GitHub as a new release. Requires the [GitHub CLI](#5-publishing-tools) to be authenticated.
 
-```powershell
-.\scripts\publish_release.ps1 -Tag v1.1.0
-```
+`powershell
+git tag v1.2.0
+.\scripts\publish_release.ps1
+`
 
 **What it does:**
-1. Ensures the release executable and NSIS installer are freshly built.
-2. Extracts the application version from CMakeLists.txt.
-3. Invokes the GitHub CLI to publish the release with auto-generated notes and attaches the installer .exe.
+1. Automatically reads the latest Git tag (e.g., 1.2.0) to determine the version.
+2. Ensures the release executable and NSIS installer are freshly built.
+3. Invokes the GitHub CLI to publish the release with auto-generated notes and attaches the generated installer .exe.
 
 **Optional parameters:**
 - -SkipBuild: Skips the build process and only attempts to publish the existing installer.
-  ```powershell
-  .\scripts\publish_release.ps1 -Tag v1.1.0 -SkipBuild
-  ```
+  `powershell
+  .\scripts\publish_release.ps1 -SkipBuild
+  `
+- -Tag: Manually override the tag instead of letting the script auto-detect the latest one.
+  `powershell
+  .\scripts\publish_release.ps1 -Tag v1.2.0
+  `
 
 **Example workflows:**
 

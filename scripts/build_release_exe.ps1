@@ -69,9 +69,14 @@ if (-not $env:VCINSTALLDIR) {
     }
 }
 
-Write-Host "[1/3] Removing stale output directory: $releaseOutputDir" -ForegroundColor Yellow
+Write-Host "[1/3] Removing stale output directories..." -ForegroundColor Yellow
 if (Test-Path $releaseOutputDir) {
     Remove-Item $releaseOutputDir -Recurse -Force
+}
+if (-not $SkipConfigure) {
+    if (Test-Path $buildDir) {
+        Remove-Item $buildDir -Recurse -Force
+    }
 }
 
 Write-Host "[2/3] Configuring CMake project..." -ForegroundColor Yellow

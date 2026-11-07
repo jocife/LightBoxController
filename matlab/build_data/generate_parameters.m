@@ -2,9 +2,6 @@ close all
 clear();
 clc();
 
-%% LED DATA
-% [led_spd, led_wls, led_names] = read_spd("input/LED_SPD_CALIBRATION.csv");
-
 %% COLOR MATCHING FUNCTION
 cmf10 = prepare_cmf("resources/ciexyz64_1.csv");
 
